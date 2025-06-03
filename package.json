@@ -1,0 +1,19 @@
+{
+  "name": "accesibilitate",
+  "version": "1.0.0",
+  "description": "Platformă de accesibilitate pentru persoane cu dizabilități",
+  "main": "index.js",
+  "scripts": {
+    "start:backend": "cd backend && node server.js",
+    "start:frontend": "cd frontend && npm start",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "install:all": "npm install && cd frontend && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["accesibilitate", "dizabilități", "platformă socială"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.0.1"
+  }
+}
