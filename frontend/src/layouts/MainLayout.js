@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
 import { useAuth } from "../contexts/AuthContext"
+import React from 'react'
 
 function MainLayout() {
   const { loading } = useAuth()

@@ -10,7 +10,7 @@ router.post("/add", auth.isAuthenticated, grupUtilizatorController.addMember)
 router.get("/getAll/:grupId", auth.isAuthenticated, grupUtilizatorController.getMembersByGroup)
 // Obține toate grupurile la care este membru un utilizator
 router.get("/userGroups/:userId", auth.isAuthenticated, grupUtilizatorController.getGroupsByUser)
-
+router.post("/join", auth.isAuthenticated, grupUtilizatorController.joinGroup)
 // Elimină un utilizator din grup
 router.delete("/remove", auth.isAuthenticated, grupUtilizatorController.removeMember)
 

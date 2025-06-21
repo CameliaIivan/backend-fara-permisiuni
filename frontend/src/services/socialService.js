@@ -25,7 +25,22 @@ export const deleteGroup = async (id) => {
   const response = await api.delete(`/grupuri/delete/${id}`)
   return response.data
 }
+export const getUserGroups = async (userId) => {
+  const response = await api.get(`/grup_utilizator/userGroups/${userId}`)
+  return response.data
+}
 
+export const joinGroup = async (groupId) => {
+  const response = await api.post('/grup_utilizator/join', { id_grup: groupId })
+  return response.data
+}
+
+export const leaveGroup = async (groupId, userId) => {
+  const response = await api.delete('/grup_utilizator/remove', {
+    data: { id_grup: groupId, id_utilizator: userId },
+  })
+  return response.data
+}
 // Posts
 export const getPosts = async (params) => {
   const response = await api.get("/postari/getAll", { params })

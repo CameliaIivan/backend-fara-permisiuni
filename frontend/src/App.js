@@ -27,6 +27,8 @@ import NewEventPage from "./pages/NewEventPage"
 import MessagesPage from "./pages/MessagesPage"
 import ConversationPage from "./pages/ConversationPage"
 import NotificationsPage from "./pages/NotificationsPage"
+import DashboardPage from "./pages/DashboardPage"
+import MyPostsPage from "./pages/MyPostsPage"
 
 // Admin Pages
 import AdminDashboardPage from "./pages/admin/DashboardPage"
@@ -54,6 +56,14 @@ function App() {
             <Route path="faq" element={<FaqPage />} />
 
             {/* Protected Routes */}
+            <Route
+              path="dashboard"
+              element={
+                <PrivateRoute>
+                  <DashboardPage />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="profile"
               element={
@@ -134,7 +144,14 @@ function App() {
                 </PrivateRoute>
               }
             />
-
+             <Route
+              path="my-posts"
+              element={
+                <PrivateRoute>
+                  <MyPostsPage />
+                </PrivateRoute>
+              }
+            />
             {/* Admin Routes */}
             <Route
               path="admin"

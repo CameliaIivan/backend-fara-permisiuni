@@ -135,6 +135,54 @@ module.exports = {
     }
   },
 
+   // Allow the current user to join a group
+  joinGroup: async (req, res) => {
+    
+    // const { id_grup } = req.body
+    // const id_utilizator = req.user.id
+
+    // if (!grupId || !userId) {
+    //     return res.status(400).json({ error: "Missing grupId or userId" });
+    // }
+    try {
+      const { id_grup } = req.body
+      const id_utilizator = req.user.id
+
+      // Check if the group exists
+      const grup = await Grup.findByPk(id_grup)
+      if (!grup) {
+        return res.status(404).json({ error: "Grup not found" })
+      }
+
+      // Private groups can only be joined by invitation (added by an admin)
+      if (grup.este_privata) {
+        return res.status(403).json({ error: "Cannot join a private group" })
+      }
+
+      // Check if the user is already a member
+      const existingMembership = await GrupUtilizator.findOne({
+        where: {
+          id_grup,
+          id_utilizator,
+        },
+      })
+
+      if (existingMembership) {
+        return res.status(400).json({ error: "User is already a member of this group" })
+      }
+
+      const membership = await GrupUtilizator.create({
+        id_grup,
+        id_utilizator,
+        rol_in_grup: "member",
+      })
+
+      res.status(201).json(membership)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
+
   // Remove a user from a group
   removeMember: async (req, res) => {
     try {

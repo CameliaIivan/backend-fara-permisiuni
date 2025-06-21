@@ -1,13 +1,63 @@
 "use client"
-
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import Button from "../components/Button"
 import Card from "../components/Card"
 import { FaHospital, FaBook, FaUsers, FaCalendarAlt } from "react-icons/fa"
+import Input from "../components/Input"
+import Textarea from "../components/Textarea"
+import Select from "../components/Select"
+import Alert from "../components/Alert" 
+import { createPost, getUserGroups } from "../services/socialService"
 
 function HomePage() {
   const { currentUser, logout } = useAuth()
+
+  const [groups, setGroups] = useState([])
+  const [postData, setPostData] = useState({ groupId: "", titlu: "", continut: "" })
+  const [submitError, setSubmitError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      if (!currentUser) return
+      try {
+        const data = await getUserGroups(currentUser.id)
+        const mapped = data.map((item) => item.Grup || item.grup)
+        setGroups(mapped)
+      } catch (err) {
+        console.error("Error fetching user groups", err)
+      }
+    }
+
+    fetchGroups()
+  }, [currentUser])
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setPostData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!postData.groupId || !postData.titlu || !postData.continut) return
+    try {
+      setIsSubmitting(true)
+      setSubmitError("")
+      await createPost({
+        titlu: postData.titlu,
+        continut: postData.continut,
+        id_grup: Number(postData.groupId),
+      })
+      setPostData({ groupId: "", titlu: "", continut: "" })
+    } catch (err) {
+      console.error("Error creating post", err)
+      setSubmitError("A apărut o eroare la crearea postării.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div>
@@ -39,6 +89,59 @@ function HomePage() {
           )}
         </div>
       </section>
+
+      {currentUser && groups.length > 0 && (
+        <section className="mb-12">
+          <Card className="max-w-xl mx-auto">
+            <Card.Header>
+              <h2 className="text-xl font-semibold">Postează în grup</h2>
+            </Card.Header>
+            <Card.Body>
+              {submitError && (
+                <Alert type="error" className="mb-4">
+                  {submitError}
+                </Alert>
+              )}
+              <form onSubmit={handleSubmit}>
+                <Select
+                  label="Grup"
+                  id="groupId"
+                  name="groupId"
+                  value={postData.groupId}
+                  onChange={handleChange}
+                  options={[
+                    { value: "", label: "Selectează grupul" },
+                    ...groups.map((g) => ({ value: g.id_grup, label: g.nume })),
+                  ]}
+                  required
+                />
+                <Input
+                  label="Titlu"
+                  id="titlu"
+                  name="titlu"
+                  value={postData.titlu}
+                  onChange={handleChange}
+                  required
+                />
+                <Textarea
+                  label="Conținut"
+                  id="continut"
+                  name="continut"
+                  value={postData.continut}
+                  onChange={handleChange}
+                  rows={4}
+                  required
+                />
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Se postează..." : "Postează"}
+                  </Button>
+                </div>
+              </form>
+            </Card.Body>
+          </Card>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="mb-12">
