@@ -9,6 +9,7 @@ import Input from "../components/Input"
 import Textarea from "../components/Textarea"
 import Select from "../components/Select"
 import Alert from "../components/Alert" 
+import MyPostsPage from "./MyPostsPage"
 import { createPost, getUserGroups } from "../services/socialService"
 
 function HomePage() {
@@ -142,7 +143,9 @@ function HomePage() {
           </Card>
         </section>
       )}
+      <MyPostsPage />
 
+      
       {/* Features Section */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-center mb-8">Ce oferim</h2>
@@ -197,7 +200,7 @@ function HomePage() {
               </Link>
             </Card.Body>
           </Card>
-
+          
           <Card className="text-center">
             <Card.Body>
               <div className="flex justify-center mb-4">

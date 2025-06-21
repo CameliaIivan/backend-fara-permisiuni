@@ -15,6 +15,7 @@ import Textarea from "../components/Textarea"
 import Select from "../components/Select"
 import Alert from "../components/Alert"
 import { FaHospital, FaBook, FaUsers, FaCalendarAlt } from "react-icons/fa"
+import MyPostsPage from "./MyPostsPage"
 
 function DashboardPage() {
   const { currentUser } = useAuth()
@@ -206,7 +207,7 @@ function DashboardPage() {
             </Card.Body>
           </Card>
         )}
-
+         <MyPostsPage />
         {loading ? (
           <div className="text-center py-8">Se încarcă feed-ul...</div>
         ) : posts.length === 0 ? (

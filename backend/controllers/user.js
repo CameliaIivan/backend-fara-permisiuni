@@ -1,9 +1,26 @@
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const { User } = require("../models")
+const { Op } = require("sequelize")
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
 module.exports = {
+  // Caută utilizatori după nume
+  searchUsers: async (req, res) => {
+    try {
+      const q = req.query.q || ""
+      const users = await User.findAll({
+        where: {
+          nume: { [Op.like]: `%${q}%` },
+        },
+        attributes: ["id_utilizator", "nume"],
+        limit: 10,
+      })
+      res.json(users)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
   // Obține toți utilizatorii
   getAll: async (req, res) => {
     try {

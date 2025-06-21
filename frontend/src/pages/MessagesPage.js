@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { getConversations } from "../services/socialService"
+import { Link, useNavigate } from "react-router-dom"
+import { getConversations, searchUsers, createConversation } from "../services/socialService"
 import Card from "../components/Card"
 import Alert from "../components/Alert"
 import Input from "../components/Input"
@@ -13,6 +13,10 @@ function MessagesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
+  const [newMessage, setNewMessage] = useState(false)
+  const [userQuery, setUserQuery] = useState("")
+  const [userResults, setUserResults] = useState([])
+  const navigate = useNavigate()
   const { currentUser } = useAuth()
 
   useEffect(() => {
@@ -32,6 +36,22 @@ function MessagesPage() {
     fetchConversations()
   }, [])
 
+  useEffect(() => {
+    const search = async () => {
+      if (!newMessage || userQuery.trim() === "") {
+        setUserResults([])
+        return
+      }
+      try {
+        const results = await searchUsers(userQuery)
+        setUserResults(results)
+      } catch (e) {
+        console.error("User search error", e)
+      }
+    }
+    search()
+  }, [userQuery, newMessage])
+
   // Filter conversations based on search term
   const filteredConversations = conversations.filter((conversation) => {
     const otherUser = currentUser.id === conversation.id_utilizator_1 ? conversation.User2 : conversation.User1
@@ -45,6 +65,15 @@ function MessagesPage() {
     const bDate = b.mesaje && b.mesaje[0] ? new Date(b.mesaje[0].data_trimitere) : new Date(b.data_start)
     return bDate - aDate
   })
+
+   const handleStartConversation = async (userId) => {
+    try {
+      const conv = await createConversation(userId)
+      navigate(`/messages/${conv.id_conversatie}`)
+    } catch (e) {
+      console.error("create conversation error", e)
+    }
+  }
 
   if (loading) {
     return <div className="text-center py-8">Se încarcă conversațiile...</div>
@@ -70,7 +99,39 @@ function MessagesPage() {
           placeholder="Caută după nume..."
         />
       </div>
-
+      <div className="mb-6">
+        <button
+          className="text-sm text-primary-600 underline mb-2"
+          onClick={() => setNewMessage(!newMessage)}
+        >
+          {newMessage ? "Anulează" : "Scrie mesaj nou"}
+        </button>
+        {newMessage && (
+          <div className="mt-2 space-y-2">
+            <Input
+              label="Caută utilizatori"
+              id="userSearch"
+              type="text"
+              value={userQuery}
+              onChange={(e) => setUserQuery(e.target.value)}
+              placeholder="Introdu numele utilizatorului"
+            />
+            {userResults.length > 0 && (
+              <ul className="bg-white border rounded-md divide-y max-h-48 overflow-y-auto">
+                {userResults.map((u) => (
+                  <li
+                    key={u.id_utilizator}
+                    className="p-2 cursor-pointer hover:bg-primary-100"
+                    onClick={() => handleStartConversation(u.id_utilizator)}
+                  >
+                    {u.nume}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
       {sortedConversations.length === 0 ? (
         <div className="text-center py-8 bg-gray-50 rounded-lg">
           <p className="text-lg text-gray-600 mb-4">Nu ai nicio conversație activă.</p>

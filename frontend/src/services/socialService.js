@@ -161,7 +161,10 @@ export const createConversation = async (userId) => {
   const response = await api.post("/conversatii/create", { id_destinatar: userId })
   return response.data
 }
-
+export const searchUsers = async (query) => {
+  const response = await api.get(`/users/search`, { params: { q: query } })
+  return response.data
+}
 export const getMessagesByConversation = async (conversationId) => {
   const response = await api.get(`/mesaje/conversatie/${conversationId}`)
   return response.data

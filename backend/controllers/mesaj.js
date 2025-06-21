@@ -1,4 +1,4 @@
-const { Mesaj, Conversatie, User } = require("../models")
+const { Mesaj, Conversatie, User, Notificare } = require("../models")
 const { Op } = require("sequelize")
 
 module.exports = {
@@ -141,6 +141,16 @@ module.exports = {
         ],
       })
 
+       const destinatarId =
+        conversatie.id_utilizator_1 === id_expeditor
+          ? conversatie.id_utilizator_2
+          : conversatie.id_utilizator_1
+
+      await Notificare.create({
+        id_utilizator: destinatarId,
+        continut: `Mesaj nou de la ${completeMesaj.User.nume}`,
+      })
+      
       res.status(201).json(completeMesaj)
     } catch (error) {
       res.status(500).json({ error: error.message })

@@ -14,7 +14,7 @@ const router = express.Router()
 
 const userController = require("../controllers").userController
 const auth = require("../middlewares/index")
-
+router.get("/search", auth.isAuthenticated, userController.searchUsers)
 router.get(
   "/getAll",
   auth.isAuthenticated,
