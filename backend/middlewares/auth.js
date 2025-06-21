@@ -81,9 +81,25 @@ const isPremiumOrAdmin = (req, res, next) => {
 
   next()
 }
+/**
+ * Middleware generic pentru verificarea rolurilor permise
+ * @param {...string} roles - rolurile care pot accesa ruta
+ */
+const permit = (...roles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized: No user found" })
+  }
+
+  if (!roles.includes(req.user.rol)) {
+    return res.status(403).json({ error: "Forbidden: Access denied" })
+  }
+
+  next()
+}
 
 module.exports = {
   isAuthenticated,
   isAdmin,
   isPremiumOrAdmin,
+  permit,
 }

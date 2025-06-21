@@ -1,39 +1,4 @@
-// const { DataTypes } = require("sequelize")
-// const sequelize = require("../config/db")
 
-// const Eveniment = sequelize.define(
-//   "eveniment",
-//   {
-//     id_eveniment: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     id_postare: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//     data_eveniment: {
-//       type: DataTypes.DATE,
-//       allowNull: false,
-//     },
-//     locatie: {
-//       type: DataTypes.STRING,
-//     },
-//     nr_maxim_participanti: {
-//       type: DataTypes.INTEGER,
-//     },
-//     alte_detalii: {
-//       type: DataTypes.TEXT,
-//     },
-//   },
-//   {
-//     underscored: true,
-//     freezeTableName: true,
-//   },
-// )
-
-// module.exports = Eveniment
 const { Model, DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
@@ -44,7 +9,8 @@ module.exports = (sequelize) => {
     data_eveniment:        { type: DataTypes.DATE, allowNull: false },
     locatie:               { type: DataTypes.STRING(255) },
     nr_maxim_participanti: { type: DataTypes.INTEGER },
-    alte_detalii:          { type: DataTypes.TEXT }
+    alte_detalii:          { type: DataTypes.TEXT },
+    aprobat:               { type: DataTypes.BOOLEAN, defaultValue: false }
   }, {
     sequelize,
     modelName: 'Eveniment',

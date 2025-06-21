@@ -28,6 +28,9 @@ module.exports = {
   // Creează un nou utilizator (hash-uind parola)
   addUser: async (req, res) => {
     try {
+      if (req.user.rol !== "admin") {
+        return res.status(403).json({ error: "Only administrators can create users" })
+      }
       const { nume, email, parola, rol } = req.body
       const hashedPassword = await bcrypt.hash(parola, 10)
       const newUser = await User.create({
@@ -47,6 +50,9 @@ module.exports = {
     try {
       const user = await User.findByPk(req.params.id)
       if (!user) return res.status(404).json({ error: "User not found" })
+      if (req.user.rol !== "admin" && req.user.id !== user.id_utilizator) {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
       if (req.body.parola) {
         req.body.parola_hash = await bcrypt.hash(req.body.parola, 10)
         delete req.body.parola
@@ -61,6 +67,9 @@ module.exports = {
   // Șterge un utilizator
   deleteUser: async (req, res) => {
     try {
+      if (req.user.rol !== "admin") {
+        return res.status(403).json({ error: "Only administrators can delete users" })
+      }
       const user = await User.findByPk(req.params.id)
       if (!user) return res.status(404).json({ error: "User not found" })
       await user.destroy()

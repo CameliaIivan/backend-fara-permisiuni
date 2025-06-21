@@ -84,7 +84,11 @@ function NotificationsPage() {
             >
               <Card.Body className="flex justify-between items-center">
                 <div>
-                  <p className="whitespace-pre-line">{notification.continut}</p>
+                  {/* <p className="whitespace-pre-line">{notification.continut}</p> */}
+                  <p
+                    className="whitespace-pre-line"
+                    dangerouslySetInnerHTML={{ __html: notification.continut }}
+                  ></p>
                   <p className="text-sm text-gray-500 mt-1">
                     {new Date(notification.data).toLocaleDateString("ro-RO", {
                       day: "numeric",

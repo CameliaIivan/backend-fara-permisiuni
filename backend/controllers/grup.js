@@ -48,7 +48,10 @@ module.exports = {
 
   getGrupById: async (req, res) => {
     try {
-      const grupId = req.params.id
+      const grupId = parseInt(req.params.id, 10)
+      if (isNaN(grupId)) {
+        return res.status(400).json({ error: "Invalid group ID" })
+      }
       const userId = req.user ? req.user.id : null
 
       const grup = await Grup.findByPk(grupId, {
@@ -150,7 +153,10 @@ module.exports = {
 
   updateGrup: async (req, res) => {
     try {
-      const grupId = req.params.id
+      const grupId = parseInt(req.params.id, 10)
+      if (isNaN(grupId)) {
+        return res.status(400).json({ error: "Invalid group ID" })
+      }
       const userId = req.user.id
 
       const grup = await Grup.findByPk(grupId)
@@ -188,7 +194,10 @@ module.exports = {
 
   deleteGrup: async (req, res) => {
     try {
-      const grupId = req.params.id
+      const grupId = parseInt(req.params.id, 10)
+      if (isNaN(grupId)) {
+        return res.status(400).json({ error: "Invalid group ID" })
+      }
       const userId = req.user.id
 
       const grup = await Grup.findByPk(grupId)

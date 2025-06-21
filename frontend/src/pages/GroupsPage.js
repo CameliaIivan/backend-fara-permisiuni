@@ -40,9 +40,14 @@ function GroupsPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Grupuri</h1>
         {isPremium && (
-          <Link to="/groups/new">
-            <Button>Creează grup nou</Button>
-          </Link>
+          <div className="space-x-2">
+            <Link to="/groups/new">
+              <Button>Creează grup nou</Button>
+            </Link>
+            <Link to="/events/new">
+              <Button variant="outline">Creează eveniment</Button>
+            </Link>
+          </div>
         )}
       </div>
 

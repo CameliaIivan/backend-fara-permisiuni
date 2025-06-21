@@ -16,7 +16,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // If we have a token, verify it and get user data
     if (token) {
       axios
         .get(`${API_URL}/auth/me`, {
@@ -25,7 +24,11 @@ export function AuthProvider({ children }) {
           },
         })
         .then((response) => {
-          setCurrentUser(response.data.user)
+          const user = response.data
+          if (user && user.id_utilizator && !user.id) {
+            user.id = user.id_utilizator
+          }
+          setCurrentUser(user)
           setLoading(false)
         })
         .catch((error) => {
@@ -92,7 +95,11 @@ export function AuthProvider({ children }) {
           Authorization: `Bearer ${token}`,
         },
       })
-      setCurrentUser({ ...currentUser, ...response.data })
+      const updatedUser = { ...currentUser, ...response.data }
+      if (updatedUser.id_utilizator && !updatedUser.id) {
+        updatedUser.id = updatedUser.id_utilizator
+      }
+      setCurrentUser(updatedUser)
       return response.data
     } catch (error) {
       throw error.response?.data?.error || "Profile update failed"

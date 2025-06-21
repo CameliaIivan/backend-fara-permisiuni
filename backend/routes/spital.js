@@ -7,9 +7,29 @@ const auth = require("../middlewares/index")
 // Pentru rutele care modifică datele din tabelul spital,
 // este de preferat ca doar admin-ul să aibă acces, deci middleware-ul poate verifica acest aspect
 router.get("/getAll", spitalController.getAll)
-router.get("/:id", auth.isAuthenticated, spitalController.getSpitalById)
-router.post("/create", auth.isAuthenticated, spitalController.createSpital)
-router.put("/update/:id", auth.isAuthenticated, spitalController.updateSpital)
-router.delete("/delete/:id", auth.isAuthenticated, spitalController.deleteSpital)
+// router.get("/:id", auth.isAuthenticated, spitalController.getSpitalById)
+// router.post("/create", auth.isAuthenticated, spitalController.createSpital)
+// router.put("/update/:id", auth.isAuthenticated, spitalController.updateSpital)
+// router.delete("/delete/:id", auth.isAuthenticated, spitalController.deleteSpital)
+router.get("/:id", spitalController.getSpitalById)
+router.post(
+  "/create",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  spitalController.createSpital,
+)
+router.put(
+  "/update/:id",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  spitalController.updateSpital,
+)
+router.delete(
+  "/delete/:id",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  spitalController.deleteSpital,
+)
+
 
 module.exports = router

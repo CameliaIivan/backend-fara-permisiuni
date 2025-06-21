@@ -110,6 +110,17 @@ export const deleteEvent = async (id) => {
   return response.data
 }
 
+export const getPendingEvents = async () => {
+  const response = await api.get('/evenimente/pending')
+  return response.data
+}
+
+export const approveEvent = async (id) => {
+  const response = await api.post(`/evenimente/approve/${id}`)
+  return response.data
+}
+
+
 export const joinEvent = async (eventId) => {
   const response = await api.post("/participare_evenimente/join", { id_eveniment: eventId })
   return response.data
@@ -153,11 +164,11 @@ export const getNotifications = async () => {
 }
 
 export const markNotificationAsRead = async (id) => {
-  const response = await api.put(`/notificari/mark-read/${id}`)
+  const response = await api.put(`/notificari/markAsRead/${id}`)
   return response.data
 }
 
 export const markAllNotificationsAsRead = async () => {
-  const response = await api.put("/notificari/mark-all-read")
+  const response = await api.put("/notificari/markAllAsRead")
   return response.data
 }

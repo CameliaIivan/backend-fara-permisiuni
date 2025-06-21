@@ -4,7 +4,7 @@ module.exports = {
   // Get all members of a group
   getMembersByGroup: async (req, res) => {
     try {
-      const grupId = req.params.idGrup
+      const grupId = req.params.grupId
 
       // Check if the group exists
       const grup = await Grup.findByPk(grupId)
@@ -46,7 +46,7 @@ module.exports = {
   // Get all groups a user is a member of
   getGroupsByUser: async (req, res) => {
     try {
-      const userId = req.params.idUser || req.user.id
+      const userId = req.params.userId || req.user.id
 
       // Check if the user exists
       const user = await User.findByPk(userId)

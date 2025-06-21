@@ -7,7 +7,7 @@ import Card from "../components/Card"
 import { FaHospital, FaBook, FaUsers, FaCalendarAlt } from "react-icons/fa"
 
 function HomePage() {
-  const { currentUser } = useAuth()
+  const { currentUser, logout } = useAuth()
 
   return (
     <div>
@@ -18,7 +18,7 @@ function HomePage() {
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Informații, resurse și o comunitate dedicată persoanelor cu dizabilități
           </p>
-          {!currentUser && (
+          {!currentUser ? (
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/register">
                 <Button size="lg">Înregistrează-te</Button>
@@ -28,6 +28,13 @@ function HomePage() {
                   Autentifică-te
                 </Button>
               </Link>
+            </div>
+            ) : (
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <p className="text-xl mb-4">Bine ai venit, {currentUser.nume}!</p>
+              <Button onClick={logout} variant="outline" size="lg" className="bg-white">
+                Deconectează-te
+              </Button>
             </div>
           )}
         </div>

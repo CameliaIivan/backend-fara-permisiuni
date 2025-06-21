@@ -5,12 +5,24 @@ async function seed() {
   await sequelize.authenticate();
   await sequelize.sync({ force: true }); // recreează tabelele
 
-  // 1) Crează un admin
+  // 1) Crează useri
   await User.create({
     nume: 'Administrator',
     email: 'admin@exemplu.com',
     parola_hash: await require('bcrypt').hash('password123', 10),
     rol: 'admin',
+  });
+    await User.create({
+    nume: 'User Basic',
+    email: 'basic@exemplu.com',
+    parola_hash: await require('bcrypt').hash('password123', 10),
+    rol: 'basic',
+  });
+    await User.create({
+    nume: 'User Premium',
+    email: 'premium@exemplu.com',
+    parola_hash: await require('bcrypt').hash('password123', 10),
+    rol: 'premium',
   });
 
   // 2) Câteva categorii de articole

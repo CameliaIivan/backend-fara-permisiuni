@@ -94,16 +94,13 @@ module.exports = {
         return res.status(404).json({ error: "Postare not found" })
       }
 
-      // Check if the post is in a private group and the user is not a member
+      
       if (postare.id_grup) {
         const grup = postare.grup
         if (grup && grup.este_privata) {
-          // If user is not authenticated, deny access
           if (!req.user) {
             return res.status(403).json({ error: "This post is in a private group" })
           }
-
-          // Check if user is a member of the group
           const isMember = await GrupUtilizator.findOne({
             where: {
               id_grup: postare.id_grup,

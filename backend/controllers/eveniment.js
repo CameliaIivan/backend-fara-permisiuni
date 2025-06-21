@@ -1,10 +1,11 @@
-const { Eveniment, Postare, User, ParticipareEveniment } = require("../models")
+const { Eveniment, Postare, User, ParticipareEveniment, Notificare } = require("../models")
 const { Op } = require("sequelize")
 
 module.exports = {
   getAll: async (req, res) => {
     try {
       const evenimente = await Eveniment.findAll({
+        where: { aprobat: true },
         include: [
           {
             model: Postare,
@@ -23,7 +24,6 @@ module.exports = {
       res.status(500).json({ error: error.message })
     }
   },
-
   getEvenimentById: async (req, res) => {
     try {
       const eveniment = await Eveniment.findByPk(req.params.id, {
@@ -50,13 +50,15 @@ module.exports = {
       })
 
       if (!eveniment) return res.status(404).json({ error: "Eveniment not found" })
+      // if (!eveniment.aprobat && req.user.rol !== "admin") {
+      //   return res.status(403).json({ error: "Event not approved" })
+      // }
 
       res.json(eveniment)
     } catch (error) {
       res.status(500).json({ error: error.message })
     }
   },
-
   getUpcomingEvents: async (req, res) => {
     try {
       const evenimente = await Eveniment.findAll({
@@ -64,6 +66,7 @@ module.exports = {
           data_eveniment: {
             [Op.gte]: new Date(),
           },
+          aprobat: true,
         },
         include: [
           {
@@ -85,18 +88,14 @@ module.exports = {
       res.status(500).json({ error: error.message })
     }
   },
-
   createEveniment: async (req, res) => {
     try {
       const userId = req.user.id
-      const { titlu, continut, data_eveniment, locatie, nr_maxim_participanti, alte_detalii, id_grup } = req.body
-
-      // Check if user has permission to create events
+      const { titlu, continut, data_eveniment, locatie, 
+        nr_maxim_participanti, alte_detalii, id_grup } = req.body
       if (req.user.rol === "basic") {
         return res.status(403).json({ error: "Only premium or admin users can create events" })
       }
-
-      // First create the post
       const postare = await Postare.create({
         titlu,
         continut,
@@ -104,17 +103,24 @@ module.exports = {
         creat_de: userId,
         id_grup,
       })
-
-      // Then create the event linked to the post
       const eveniment = await Eveniment.create({
         id_postare: postare.id_postare,
         data_eveniment,
         locatie,
         nr_maxim_participanti,
         alte_detalii,
+        aprobat: false,
       })
-
-      // Get the complete event with post and user info
+      // Notifică toți administratorii că există un eveniment ce necesită aprobare
+      const admini = await User.findAll({ where: { rol: 'admin' } })
+      await Promise.all(
+        admini.map((admin) =>
+          Notificare.create({
+            id_utilizator: admin.id_utilizator,
+            continut: `Evenimentul "${titlu}" necesită aprobare`,
+          })
+        )
+      )
       const completeEveniment = await Eveniment.findByPk(eveniment.id_eveniment, {
         include: [
           {
@@ -128,7 +134,6 @@ module.exports = {
           },
         ],
       })
-
       res.status(201).json(completeEveniment)
     } catch (error) {
       res.status(500).json({ error: error.message })
@@ -154,7 +159,7 @@ module.exports = {
       }
 
       // Update the event
-      const { data_eveniment, locatie, nr_maxim_participanti, alte_detalii } = req.body
+      const { data_eveniment, locatie, nr_maxim_participanti, alte_detalii, aprobat } = req.body
       await eveniment.update({
         data_eveniment,
         locatie,
@@ -190,7 +195,43 @@ module.exports = {
       res.status(500).json({ error: error.message })
     }
   },
+  
+  getPendingEvents: async (req, res) => {
+    try {
+      if (req.user.rol !== "admin") {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
+      const events = await Eveniment.getAll({
+        where: { aprobat: false },
+        include: [
+          {
+            model: Postare,
+            include: [{ model: User, attributes: ["id_utilizator", "nume"] }],
+          },
+        ],
+        order: [["data_eveniment", "ASC"]],
+      })
+      res.json(events)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
 
+  approveEveniment: async (req, res) => {
+    try {
+      if (req.user.rol !== "admin") {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
+      const eveniment = await Eveniment.findByPk(req.params.id)
+      if (!eveniment) {
+        return res.status(404).json({ error: "Eveniment not found" })
+      }
+      await eveniment.update({ aprobat: true })
+      res.json(eveniment)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
   deleteEveniment: async (req, res) => {
     try {
       const eveniment = await Eveniment.findByPk(req.params.id, {

@@ -20,8 +20,10 @@ import FaqPage from "./pages/admin/FaqPage"
 import ProfilePage from "./pages/ProfilePage"
 import GroupsPage from "./pages/GroupsPage"
 import GroupDetailPage from "./pages/GroupDetailPage"
+import GroupCreatePage from "./pages/GroupCreatePage"
 import EventsPage from "./pages/EventsPage"
 import EventDetailPage from "./pages/EventDetailPage"
+import NewEventPage from "./pages/NewEventPage"
 import MessagesPage from "./pages/MessagesPage"
 import ConversationPage from "./pages/ConversationPage"
 import NotificationsPage from "./pages/NotificationsPage"
@@ -33,6 +35,7 @@ import AdminArticlesPage from "./pages/admin/ArticlesPage"
 import AdminHospitalsPage from "./pages/admin/HospitalsPage"
 import AdminSpecializationsPage from "./pages/admin/SpecializationsPage"
 import AdminFaqPage from "./pages/admin/FaqPage"
+import PendingEventsPage from "./pages/admin/PendingEventsPage";
 
 function App() {
   return (
@@ -68,6 +71,14 @@ function App() {
               }
             />
             <Route
+              path="groups/new"
+              element={
+                <PrivateRoute>
+                  <GroupCreatePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="groups/:id"
               element={
                 <PrivateRoute>
@@ -80,6 +91,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <EventsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="events/new"
+              element={
+                <PrivateRoute>
+                  <NewEventPage />
                 </PrivateRoute>
               }
             />
@@ -122,6 +141,14 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminDashboardPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="admin/events"
+              element={
+                <AdminRoute>
+                  <PendingEventsPage />
                 </AdminRoute>
               }
             />

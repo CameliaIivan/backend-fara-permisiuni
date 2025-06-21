@@ -37,9 +37,17 @@ Specializare.belongsToMany(Spital, { through: SpitalSpecializare, foreignKey: 'i
 
 Grup.belongsTo(User, { foreignKey: 'creat_de', as: 'creator' });
 User.hasMany(Grup, { foreignKey: 'creat_de' });
+// Relația dintre Grup și utilizatorii săi (membri)
+Grup.hasMany(GrupUtilizator, {
+  foreignKey: 'id_grup',
+  as: 'GrupUtilizatori',
+});
+GrupUtilizator.belongsTo(Grup, { foreignKey: 'id_grup' });
 
 Grup.belongsToMany(User, { through: GrupUtilizator, foreignKey: 'id_grup' });
 User.belongsToMany(Grup, { through: GrupUtilizator, foreignKey: 'id_utilizator' });
+User.hasMany(GrupUtilizator, { foreignKey: 'id_utilizator' });
+GrupUtilizator.belongsTo(User, { foreignKey: 'id_utilizator' });
 
 Postare.belongsTo(User, { foreignKey: 'creat_de' });
 User.hasMany(Postare, { foreignKey: 'creat_de' });
