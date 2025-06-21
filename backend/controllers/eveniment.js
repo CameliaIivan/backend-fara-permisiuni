@@ -201,7 +201,7 @@ module.exports = {
       if (req.user.rol !== "admin") {
         return res.status(403).json({ error: "Unauthorized" })
       }
-      const events = await Eveniment.getAll({
+      const events = await Eveniment.findAll({
         where: { aprobat: false },
         include: [
           {

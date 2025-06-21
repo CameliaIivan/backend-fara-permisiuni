@@ -4,7 +4,7 @@ module.exports = {
   // Get all participants for an event
   getParticipantsByEvent: async (req, res) => {
     try {
-      const evenimentId = req.params.idEveniment
+      const evenimentId = req.params.evenimentId
 
       // Check if the event exists
       const eveniment = await Eveniment.findByPk(evenimentId)
@@ -32,7 +32,7 @@ module.exports = {
   // Get all events a user is participating in
   getEventsByUser: async (req, res) => {
     try {
-      const userId = req.params.idUser || req.user.id
+      const userId = req.params.userId || req.user.id
 
       // Check if the user exists
       const user = await User.findByPk(userId)

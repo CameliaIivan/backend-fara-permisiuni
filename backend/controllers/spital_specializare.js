@@ -4,7 +4,7 @@ module.exports = {
   // Get all specializations for a hospital
   getSpecializariBySpital: async (req, res) => {
     try {
-      const spitalId = req.params.idSpital
+      const spitalId = req.params.spitalId
 
       // Check if the hospital exists
       const spital = await Spital.findByPk(spitalId)
@@ -32,7 +32,7 @@ module.exports = {
   // Get all hospitals with a specific specialization
   getSpitaleBySpecializare: async (req, res) => {
     try {
-      const specializareId = req.params.idSpecializare
+      const specializareId = req.params.specializareId
 
       // Check if the specialization exists
       const specializare = await Specializare.findByPk(specializareId)

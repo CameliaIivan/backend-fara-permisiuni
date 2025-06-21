@@ -44,16 +44,18 @@ export function AuthProvider({ children }) {
   // Login function
   const login = async (email, password) => {
     try {
-      console.log("Attempting login with:", { email, password })
-      console.log("API URL:", `${API_URL}/auth/login`)
-
+      if (process.env.NODE_ENV === "development") {
+        console.log("Attempting login with:", { email, password })
+        console.log("API URL:", `${API_URL}/auth/login`)
+      }
       const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         parola: password,
       })
 
-      console.log("Login response:", response.data)
-
+      if (process.env.NODE_ENV === "development") {
+        console.log("Login response:", response.data)
+      }
       const { token, user } = response.data
       localStorage.setItem("token", token)
       setToken(token)

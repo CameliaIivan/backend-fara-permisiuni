@@ -31,7 +31,9 @@ function LoginPage() {
 
     try {
       setLoading(true)
-      console.log("Submitting login with:", { email, password })
+      if (process.env.NODE_ENV === "development") {
+        console.log("Submitting login with:", { email, password })
+      }      
       await login(email, password)
       navigate(from, { replace: true })
     } catch (error) {
