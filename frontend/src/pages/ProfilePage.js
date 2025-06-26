@@ -31,7 +31,7 @@ function ProfilePage() {
   const handleLogout = async () => {
     try {
       await logout()
-      navigate('/login')
+      navigate('/')
     } catch (error) {
       setError("A apărut o eroare la deconectare")
     }

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link , useNavigate} from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import Button from "../components/Button"
 import Card from "../components/Card"
@@ -14,6 +14,7 @@ import { createPost, getUserGroups } from "../services/socialService"
 
 function HomePage() {
   const { currentUser, logout } = useAuth()
+  const navigate = useNavigate()
 
   const [groups, setGroups] = useState([])
   const [postData, setPostData] = useState({ groupId: "", titlu: "", continut: "" })
@@ -39,7 +40,10 @@ function HomePage() {
     const { name, value } = e.target
     setPostData((prev) => ({ ...prev, [name]: value }))
   }
-
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+  }
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!postData.groupId || !postData.titlu || !postData.continut) return
@@ -83,7 +87,7 @@ function HomePage() {
             ) : (
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <p className="text-xl mb-4">Bine ai venit, {currentUser.nume}!</p>
-              <Button onClick={logout} variant="outline" size="lg" className="bg-white">
+              <Button onClick={handleLogout} variant="outline" size="lg" className="bg-white">
                 Deconectează-te
               </Button>
             </div>

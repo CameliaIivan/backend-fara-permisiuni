@@ -3,39 +3,24 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import {
-  getUserGroups,
-  getPosts,
-  createPost,
-} from "../services/socialService"
+import { getUserGroups, getPosts } from "../services/socialService"
 import Card from "../components/Card"
 import Button from "../components/Button"
-import Input from "../components/Input"
-import Textarea from "../components/Textarea"
-import Select from "../components/Select"
 import Alert from "../components/Alert"
 import { FaHospital, FaBook, FaUsers, FaCalendarAlt } from "react-icons/fa"
-import MyPostsPage from "./MyPostsPage"
+
 
 function DashboardPage() {
   const { currentUser } = useAuth()
-  const [groups, setGroups] = useState([])
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [newPost, setNewPost] = useState({ titlu: "", continut: "", id_grup: "" })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
+  
   useEffect(() => {
     const fetchFeed = async () => {
       try {
         setLoading(true)
         const memberships = await getUserGroups(currentUser.id)
-        const groupOptions = memberships.map((m) => ({
-          value: m.id_grup,
-          label: m.grup.nume,
-        }))
-        setGroups(groupOptions)
         const groupIds = memberships.map((m) => m.id_grup)
         const allPosts = await getPosts()
         const filtered = allPosts.filter((p) => groupIds.includes(p.id_grup))
@@ -53,36 +38,7 @@ function DashboardPage() {
     }
   }, [currentUser])
 
-  const handlePostChange = (e) => {
-    const { name, value } = e.target
-    setNewPost((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-
-  const handleSubmitPost = async (e) => {
-    e.preventDefault()
-    if (!newPost.titlu || !newPost.continut || !newPost.id_grup) return
-
-    try {
-      setIsSubmitting(true)
-      const data = await createPost({
-        titlu: newPost.titlu,
-        continut: newPost.continut,
-        tip: "text",
-        id_grup: Number.parseInt(newPost.id_grup),
-      })
-      setPosts((prev) => [data, ...prev])
-      setNewPost({ titlu: "", continut: "", id_grup: "" })
-    } catch (err) {
-      console.error("Error creating post:", err)
-      setError("A apărut o eroare la creare. Vă rugăm încercați din nou.")
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
+  
   return (
     <div>
       {/* Features Section */}
@@ -165,49 +121,7 @@ function DashboardPage() {
             {error}
           </Alert>
         )}
-        {groups.length > 0 && (
-          <Card className="mb-6">
-            <Card.Header>
-              <h3 className="text-xl font-semibold">Creează o postare</h3>
-            </Card.Header>
-            <Card.Body>
-              <form onSubmit={handleSubmitPost}>
-                <Select
-                  label="Grup"
-                  id="id_grup"
-                  name="id_grup"
-                  value={newPost.id_grup}
-                  onChange={handlePostChange}
-                  options={[{ value: "", label: "Alege grupul" }, ...groups]}
-                  required
-                />
-                <Input
-                  label="Titlu"
-                  id="titlu"
-                  name="titlu"
-                  value={newPost.titlu}
-                  onChange={handlePostChange}
-                  required
-                />
-                <Textarea
-                  label="Conținut"
-                  id="continut"
-                  name="continut"
-                  rows={4}
-                  value={newPost.continut}
-                  onChange={handlePostChange}
-                  required
-                />
-                <div className="flex justify-end">
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Se postează..." : "Postează"}
-                  </Button>
-                </div>
-              </form>
-            </Card.Body>
-          </Card>
-        )}
-         <MyPostsPage />
+        
         {loading ? (
           <div className="text-center py-8">Se încarcă feed-ul...</div>
         ) : posts.length === 0 ? (
@@ -224,11 +138,11 @@ function DashboardPage() {
                   <div className="flex justify-between items-center text-sm text-gray-500">
                     <div>
                       <p>
-                        Postat de: <span className="font-medium">{post.utilizator?.nume || "Utilizator necunoscut"}</span>
+                       Postat de: <span className="font-medium">{post.utilizator?.nume || post.User?.nume || "Utilizator necunoscut"}</span>
                       </p>
                       <p>{new Date(post.data_postarii).toLocaleDateString("ro-RO")}</p>
                     </div>
-                    <p>{post.grup?.nume}</p>
+                    <p>{post.Grup?.nume || post.grup?.nume}</p>
                   </div>
                 </Card.Body>
               </Card>
