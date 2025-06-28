@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { getHospitals, getSpecializations, deleteHospital } from "../../services/hospitalService"
+import { getHospitals, getSpecializations, createHospital, updateHospital, deleteHospital } from "../../services/hospitalService"
 import Card from "../../components/Card"
 import Button from "../../components/Button"
 import Alert from "../../components/Alert"
 import Select from "../../components/Select"
 import Input from "../../components/Input"
+import Textarea from "../../components/Textarea"
 
 function HospitalsPage() {
   const [hospitals, setHospitals] = useState([])
@@ -15,6 +16,17 @@ function HospitalsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [editingHospital, setEditingHospital] = useState(null)
+  const [formData, setFormData] = useState({
+    nume: "",
+    locatie: "",
+    tip_serviciu: "",
+    grad_accesibilitate: "",
+    contact: "",
+    website: "",
+    descriere: "",
+    specializari: [],
+  })
   const [filters, setFilters] = useState({
     nume: "",
     locatie: "",
@@ -75,6 +87,64 @@ function HospitalsPage() {
       setError(error.response?.data?.error || "A apărut o eroare la ștergerea spitalului.")
     }
   }
+   const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleSpecializationsChange = (e) => {
+    const options = Array.from(e.target.selectedOptions, (o) => Number(o.value))
+    setFormData((prev) => ({ ...prev, specializari: options }))
+  }
+
+  const handleEditHospital = (hospital) => {
+    setEditingHospital(hospital)
+    setFormData({
+      nume: hospital.nume,
+      locatie: hospital.locatie,
+      tip_serviciu: hospital.tip_serviciu || "",
+      grad_accesibilitate: hospital.grad_accesibilitate || "",
+      contact: hospital.contact || "",
+      website: hospital.website || "",
+      descriere: hospital.descriere || "",
+      specializari: hospital.specializari ? hospital.specializari.map((s) => s.id_specializare) : [],
+    })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingHospital(null)
+    setFormData({
+      nume: "",
+      locatie: "",
+      tip_serviciu: "",
+      grad_accesibilitate: "",
+      contact: "",
+      website: "",
+      descriere: "",
+      specializari: [],
+    })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      if (editingHospital) {
+        await updateHospital(editingHospital.id_spital, formData)
+        setSuccess(`Spitalul ${formData.nume} a fost actualizat cu succes.`)
+      } else {
+        await createHospital(formData)
+        setSuccess(`Spitalul ${formData.nume} a fost creat cu succes.`)
+      }
+      fetchData()
+      handleCancelEdit()
+    } catch (error) {
+      console.error("Error saving hospital:", error)
+      setError(error.response?.data?.error || "A apărut o eroare la salvarea spitalului.")
+    }
+  }
 
   if (loading && hospitals.length === 0) {
     return <div className="text-center py-8">Se încarcă spitalele...</div>
@@ -82,12 +152,7 @@ function HospitalsPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Gestionare spitale</h1>
-        <Link to="/admin/hospitals/new">
-          <Button>Adaugă spital nou</Button>
-        </Link>
-      </div>
+      <h1 className="text-3xl font-bold mb-6">Gestionare spitale</h1>
 
       {error && (
         <Alert type="error" className="mb-6" dismissible onDismiss={() => setError("")}>
@@ -100,6 +165,98 @@ function HospitalsPage() {
           {success}
         </Alert>
       )}
+
+      <Card className="mb-8">
+        <Card.Header>
+          <h2 className="text-xl font-semibold">
+            {editingHospital ? "Editare spital" : "Adaugă spital nou"}
+          </h2>
+        </Card.Header>
+        <Card.Body>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Nume"
+                id="nume"
+                name="nume"
+                value={formData.nume}
+                onChange={handleInputChange}
+                required
+              />
+              <Input
+                label="Locație"
+                id="locatie"
+                name="locatie"
+                value={formData.locatie}
+                onChange={handleInputChange}
+                required
+              />
+              <Input
+                label="Tip serviciu"
+                id="tip_serviciu"
+                name="tip_serviciu"
+                value={formData.tip_serviciu}
+                onChange={handleInputChange}
+              />
+              <Select
+                label="Grad accesibilitate"
+                id="grad_accesibilitate"
+                name="grad_accesibilitate"
+                value={formData.grad_accesibilitate}
+                onChange={handleInputChange}
+                options={[
+                  { value: "", label: "Nespecificat" },
+                  { value: "ridicat", label: "Ridicat" },
+                  { value: "mediu", label: "Mediu" },
+                  { value: "scazut", label: "Scăzut" },
+                ]}
+              />
+              <Input
+                label="Contact"
+                id="contact"
+                name="contact"
+                value={formData.contact}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Website"
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={handleInputChange}
+              />
+              <Select
+                multiple
+                label="Specializări"
+                id="specializari"
+                name="specializari"
+                value={formData.specializari}
+                onChange={handleSpecializationsChange}
+                options={specializations.map((spec) => ({
+                  value: spec.id_specializare,
+                  label: spec.nume_specializare,
+                }))}
+              />
+            </div>
+            <Textarea
+              label="Descriere"
+              id="descriere"
+              name="descriere"
+              value={formData.descriere}
+              onChange={handleInputChange}
+              rows={4}
+            />
+            <div className="flex justify-end mt-4 space-x-2">
+              {editingHospital && (
+                <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                  Anulează
+                </Button>
+              )}
+              <Button type="submit">{editingHospital ? "Actualizează" : "Adaugă"}</Button>
+            </div>
+          </form>
+        </Card.Body>
+      </Card>
 
       <Card className="mb-6">
         <Card.Body>
@@ -203,11 +360,13 @@ function HospitalsPage() {
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex space-x-2">
-                    <Link to={`/admin/hospitals/edit/${hospital.id_spital}`}>
-                      <Button variant="outline" size="sm">
-                        Editează
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditHospital(hospital)}
+                    >
+                      Editează
+                    </Button>
                     <Button
                       variant="danger"
                       size="sm"

@@ -23,9 +23,16 @@ module.exports = {
   createArticol: async (req, res) => {
     try {
       if (req.user.rol !== "admin") {
-        return res.status(403).json({ error: "Doar administratorii pot crea articole" })
+        return res
+          .status(403)
+          .json({ error: "Doar administratorii pot crea articole" })
       }
-      const newArticol = await Articol.create(req.body)
+      // ensure creator is set to the current user
+      const articolData = {
+        ...req.body,
+        creat_de: req.user.id,
+      }
+      const newArticol = await Articol.create(articolData)
       res.status(201).json(newArticol)
     } catch (error) {
       res.status(500).json({ error: error.message })

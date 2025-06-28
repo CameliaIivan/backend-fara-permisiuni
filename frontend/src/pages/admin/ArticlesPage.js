@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { getArticles, getArticleCategories, deleteArticle } from "../../services/articleService"
+import { getArticles, getArticleCategories, createArticle, updateArticle, deleteArticle } from "../../services/articleService"
 import Card from "../../components/Card"
 import Button from "../../components/Button"
 import Alert from "../../components/Alert"
 import Select from "../../components/Select"
 import Input from "../../components/Input"
+import Textarea from "../../components/Textarea"
 
 function ArticlesPage() {
   const [articles, setArticles] = useState([])
@@ -15,6 +16,12 @@ function ArticlesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [editingArticle, setEditingArticle] = useState(null)
+  const [formData, setFormData] = useState({
+    titlu: "",
+    continut: "",
+    id_categorie: "",
+  })
   const [filters, setFilters] = useState({
     id_categorie: "",
     search: "",
@@ -61,6 +68,62 @@ function ArticlesPage() {
     }
   }
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleEditArticle = (article) => {
+    setEditingArticle(article)
+    setFormData({
+      titlu: article.titlu,
+      continut: article.continut,
+      id_categorie: article.id_categorie || "",
+    })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingArticle(null)
+    setFormData({
+      titlu: "",
+      continut: "",
+      id_categorie: "",
+    })
+  }
+
+  const handleSubmit = async (e) => {
+  e.preventDefault()
+  setError("")
+  setSuccess("")
+
+  // construim payload-ul cu id_categorie numeric sau null
+  const payload = {
+    titlu: formData.titlu,
+    continut: formData.continut,
+    id_categorie: formData.id_categorie
+      ? Number(formData.id_categorie)
+      : null,
+  }
+
+  try {
+    if (editingArticle) {
+      await updateArticle(editingArticle.id_articol, payload)
+      setSuccess(`Articolul "${payload.titlu}" a fost actualizat cu succes.`)
+    } else {
+      await createArticle(payload)
+      setSuccess(`Articolul "${payload.titlu}" a fost creat cu succes.`)
+    }
+    await fetchData()
+    handleCancelEdit()
+  } catch (error) {
+    console.error("Error saving article:", error)
+    setError(error.response?.data?.error || "A apărut o eroare la salvarea articolului.")
+  }
+}
+
   // Filter articles based on category and search term
   const filteredArticles = articles.filter((article) => {
     const matchesCategory = !filters.id_categorie || article.id_categorie === Number(filters.id_categorie)
@@ -77,12 +140,7 @@ function ArticlesPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Gestionare articole</h1>
-        <Link to="/admin/articles/new">
-          <Button>Adaugă articol nou</Button>
-        </Link>
-      </div>
+       <h1 className="text-3xl font-bold mb-6">Gestionare articole</h1>
 
       {error && (
         <Alert type="error" className="mb-6" dismissible onDismiss={() => setError("")}>
@@ -95,6 +153,56 @@ function ArticlesPage() {
           {success}
         </Alert>
       )}
+
+       <Card className="mb-8">
+        <Card.Header>
+          <h2 className="text-xl font-semibold">
+            {editingArticle ? "Editare articol" : "Adaugă articol nou"}
+          </h2>
+        </Card.Header>
+        <Card.Body>
+          <form onSubmit={handleSubmit}>
+            <Input
+              label="Titlu"
+              id="titlu"
+              name="titlu"
+              value={formData.titlu}
+              onChange={handleInputChange}
+              required
+            />
+            <Textarea
+              label="Conținut"
+              id="continut"
+              name="continut"
+              value={formData.continut}
+              onChange={handleInputChange}
+              rows={6}
+              required
+            />
+            <Select
+              label="Categorie"
+              id="id_categorie"
+              name="id_categorie"
+              value={formData.id_categorie}
+              onChange={handleInputChange}
+              options={[
+                { value: "", label: "Selectează categoria" },
+                ...categories.map((cat) => ({ value: cat.id_categorie, label: cat.nume })),
+              ]}
+              required
+            />
+            <div className="flex justify-end mt-4 space-x-2">
+              {editingArticle && (
+                <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                  Anulează
+                </Button>
+              )}
+              <Button type="submit">{editingArticle ? "Actualizează" : "Adaugă"}</Button>
+            </div>
+          </form>
+        </Card.Body>
+      </Card>
+
 
       <Card className="mb-6">
         <Card.Body>
@@ -149,11 +257,13 @@ function ArticlesPage() {
                   <td className="py-3 px-4">{new Date(article.data_crearii).toLocaleDateString("ro-RO")}</td>
                   <td className="py-3 px-4">
                     <div className="flex space-x-2">
-                      <Link to={`/admin/articles/edit/${article.id_articol}`}>
-                        <Button variant="outline" size="sm">
-                          Editează
-                        </Button>
-                      </Link>
+                       <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditArticle(article)}
+                      >
+                        Editează
+                      </Button>
                       <Button
                         variant="danger"
                         size="sm"
