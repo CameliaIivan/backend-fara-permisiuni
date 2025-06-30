@@ -84,7 +84,10 @@ function HospitalDetailPage() {
           <Button variant="outline">&larr; Înapoi la spitale</Button>
         </Link>
         {isAdmin && (
-          <Link to={`/admin/hospitals/edit/${hospital.id_spital}`}>
+          <Link
+            to="/admin/hospitals"
+            state={{ editHospitalId: hospital.id_spital }}
+          >
             <Button>Editează spitalul</Button>
           </Link>
         )}

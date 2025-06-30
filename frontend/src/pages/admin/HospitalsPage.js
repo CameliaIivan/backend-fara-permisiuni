@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { getHospitals, getSpecializations, createHospital, updateHospital, deleteHospital } from "../../services/hospitalService"
 import Card from "../../components/Card"
 import Button from "../../components/Button"
@@ -16,6 +16,8 @@ function HospitalsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const location = useLocation()
+  const navigate = useNavigate()
   const [editingHospital, setEditingHospital] = useState(null)
   const [formData, setFormData] = useState({
     nume: "",
@@ -37,6 +39,19 @@ function HospitalsPage() {
   useEffect(() => {
     fetchData()
   }, [])
+
+  // If navigated with an editHospitalId state, open the edit form automatically
+  useEffect(() => {
+    if (location.state?.editHospitalId && hospitals.length > 0) {
+      const hospital = hospitals.find(
+        (h) => h.id_spital === Number(location.state.editHospitalId)
+      )
+      if (hospital) {
+        handleEditHospital(hospital)
+        navigate(".", { replace: true })
+      }
+    }
+  }, [location.state, hospitals])
 
   const fetchData = async () => {
     try {
@@ -360,13 +375,11 @@ function HospitalsPage() {
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditHospital(hospital)}
-                    >
-                      Editează
-                    </Button>
+                    <Link to={`/admin/hospitals/edit/${hospital.id_spital}`}>
+                      <Button variant="outline" size="sm">
+                        Editează
+                      </Button>
+                    </Link>
                     <Button
                       variant="danger"
                       size="sm"

@@ -9,6 +9,7 @@ import Alert from "../../components/Alert"
 import Select from "../../components/Select"
 import Input from "../../components/Input"
 import Textarea from "../../components/Textarea"
+import { useAuth } from "../../contexts/AuthContext"
 
 function ArticlesPage() {
   const [articles, setArticles] = useState([])
@@ -26,6 +27,8 @@ function ArticlesPage() {
     id_categorie: "",
     search: "",
   })
+
+  const { isAdmin } = useAuth()
 
   useEffect(() => {
     fetchData()
@@ -154,54 +157,57 @@ function ArticlesPage() {
         </Alert>
       )}
 
-       <Card className="mb-8">
-        <Card.Header>
-          <h2 className="text-xl font-semibold">
-            {editingArticle ? "Editare articol" : "Adaugă articol nou"}
-          </h2>
-        </Card.Header>
-        <Card.Body>
-          <form onSubmit={handleSubmit}>
-            <Input
-              label="Titlu"
-              id="titlu"
-              name="titlu"
-              value={formData.titlu}
-              onChange={handleInputChange}
-              required
-            />
-            <Textarea
-              label="Conținut"
-              id="continut"
-              name="continut"
-              value={formData.continut}
-              onChange={handleInputChange}
-              rows={6}
-              required
-            />
-            <Select
-              label="Categorie"
-              id="id_categorie"
-              name="id_categorie"
-              value={formData.id_categorie}
-              onChange={handleInputChange}
-              options={[
-                { value: "", label: "Selectează categoria" },
-                ...categories.map((cat) => ({ value: cat.id_categorie, label: cat.nume })),
-              ]}
-              required
-            />
-            <div className="flex justify-end mt-4 space-x-2">
-              {editingArticle && (
-                <Button type="button" variant="outline" onClick={handleCancelEdit}>
-                  Anulează
-                </Button>
-              )}
-              <Button type="submit">{editingArticle ? "Actualizează" : "Adaugă"}</Button>
-            </div>
-          </form>
-        </Card.Body>
-      </Card>
+       {isAdmin && (
+        <Card className="mb-8">
+          <Card.Header>
+            <h2 className="text-xl font-semibold">
+              {editingArticle ? "Editare articol" : "Adaugă articol nou"}
+            </h2>
+          </Card.Header>
+          <Card.Body>
+            <form onSubmit={handleSubmit}>
+              <Input
+                label="Titlu"
+                id="titlu"
+                name="titlu"
+                value={formData.titlu}
+                onChange={handleInputChange}
+                required
+              />
+              <Textarea
+                label="Conținut"
+                id="continut"
+                name="continut"
+                value={formData.continut}
+                onChange={handleInputChange}
+                rows={6}
+                required
+              />
+              <Select
+                label="Categorie"
+                id="id_categorie"
+                name="id_categorie"
+                value={formData.id_categorie}
+                onChange={handleInputChange}
+                options={[
+                  { value: "", label: "Selectează categoria" },
+                  ...categories.map((cat) => ({ value: cat.id_categorie, label: cat.nume })),
+                ]}
+                required
+              />
+              <div className="flex justify-end mt-4 space-x-2">
+                {editingArticle && (
+                  <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                    Anulează
+                  </Button>
+                )}
+                <Button type="submit">{editingArticle ? "Actualizează" : "Adaugă"}</Button>
+              </div>
+            </form>
+          </Card.Body>
+        </Card>
+      )}
+
 
 
       <Card className="mb-6">
@@ -239,7 +245,9 @@ function ArticlesPage() {
               <th className="py-3 px-4 text-left">Titlu</th>
               <th className="py-3 px-4 text-left">Categorie</th>
               <th className="py-3 px-4 text-left">Data creării</th>
-              <th className="py-3 px-4 text-left">Acțiuni</th>
+               {isAdmin && (
+                <th className="py-3 px-4 text-left">Acțiuni</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -255,24 +263,26 @@ function ArticlesPage() {
                   </td>
                   <td className="py-3 px-4">{category ? category.nume : "Fără categorie"}</td>
                   <td className="py-3 px-4">{new Date(article.data_crearii).toLocaleDateString("ro-RO")}</td>
-                  <td className="py-3 px-4">
-                    <div className="flex space-x-2">
-                       <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditArticle(article)}
-                      >
-                        Editează
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDeleteArticle(article.id_articol, article.titlu)}
-                      >
-                        Șterge
-                      </Button>
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td className="py-3 px-4">
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditArticle(article)}
+                        >
+                          Editează
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleDeleteArticle(article.id_articol, article.titlu)}
+                        >
+                          Șterge
+                        </Button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               )
             })}

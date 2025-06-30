@@ -4,16 +4,17 @@ import { useAuth } from "../contexts/AuthContext";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Alert from "../components/Alert";
+import { getArticleById } from "../services/articleService";
 
 // Creează un serviciu temporar pentru articole
-const getArticleById = async (id) => {
-  return {
-    id_articol: id,
-    titlu: "Articol de test",
-    continut: "Conținut de test pentru articol",
-    data_crearii: new Date().toISOString()
-  };
-};
+// const getArticleById = async (id) => {
+//   return {
+//     id_articol: id,
+//     titlu: "Articol de test",
+//     continut: "Conținut de test pentru articol",
+//     data_crearii: new Date().toISOString()
+//   };
+// };
 
 function ArticleDetailPage() {
   const { id } = useParams();
