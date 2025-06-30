@@ -30,6 +30,7 @@ module.exports = {
       let includeClause = [
         {
           model: Specializare,
+          as: "specializari",
           through: SpitalSpecializare,
           attributes: ["id_specializare", "nume_specializare"],
         },
@@ -43,6 +44,7 @@ module.exports = {
         includeClause = [
           {
             model: Specializare,
+            as: "specializari",
             through: SpitalSpecializare,
             attributes: ["id_specializare", "nume_specializare"],
             where: { id_specializare },
@@ -75,6 +77,7 @@ module.exports = {
         include: [
           {
             model: Specializare,
+            as: "specializari",
             through: SpitalSpecializare,
             attributes: ["id_specializare", "nume_specializare"],
           },
@@ -131,6 +134,7 @@ module.exports = {
         include: [
           {
             model: Specializare,
+            as: "specializari",
             through: SpitalSpecializare,
             attributes: ["id_specializare", "nume_specializare"],
           },
@@ -161,10 +165,7 @@ module.exports = {
         return res.status(404).json({ error: "Spital not found" })
       }
 
-      const { nume, locatie, tip_serviciu, grad_accesibilitate, contact, website, descriere, specializari } = req.body
-
-      // Update the hospital
-      await spital.update({
+      const {
         nume,
         locatie,
         tip_serviciu,
@@ -172,10 +173,26 @@ module.exports = {
         contact,
         website,
         descriere,
+        specializari,
+      } = req.body
+
+      // Build update payload only with defined fields
+      const updateData = {
         modificat_de: req.user.id,
         data_modificarii: new Date(),
-      })
+      }
 
+      if (nume !== undefined) updateData.nume = nume
+      if (locatie !== undefined) updateData.locatie = locatie
+      if (tip_serviciu !== undefined) updateData.tip_serviciu = tip_serviciu
+      if (grad_accesibilitate !== undefined)
+        updateData.grad_accesibilitate = grad_accesibilitate
+      if (contact !== undefined) updateData.contact = contact
+      if (website !== undefined) updateData.website = website
+      if (descriere !== undefined) updateData.descriere = descriere
+
+      // Update the hospital
+      await spital.update(updateData)
       // Update specializations if provided
       if (specializari) {
         // Remove all current specializations
@@ -199,6 +216,7 @@ module.exports = {
         include: [
           {
             model: Specializare,
+            as: "specializari",
             through: SpitalSpecializare,
             attributes: ["id_specializare", "nume_specializare"],
           },

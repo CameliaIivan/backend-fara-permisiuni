@@ -111,8 +111,19 @@ function HospitalsPage() {
   }
 
   const handleSpecializationsChange = (e) => {
-    const options = Array.from(e.target.selectedOptions, (o) => Number(o.value))
-    setFormData((prev) => ({ ...prev, specializari: options }))
+    const { value, checked } = e.target
+    const id = Number(value)
+    setFormData((prev) => {
+      let specializari = prev.specializari
+      if (checked) {
+        if (!specializari.includes(id)) {
+          specializari = [...specializari, id]
+        }
+      } else {
+        specializari = specializari.filter((specId) => specId !== id)
+      }
+      return { ...prev, specializari }
+    })
   }
 
   const handleEditHospital = (hospital) => {
@@ -240,18 +251,26 @@ function HospitalsPage() {
                 value={formData.website}
                 onChange={handleInputChange}
               />
-              <Select
-                multiple
-                label="Specializări"
-                id="specializari"
-                name="specializari"
-                value={formData.specializari}
-                onChange={handleSpecializationsChange}
-                options={specializations.map((spec) => ({
-                  value: spec.id_specializare,
-                  label: spec.nume_specializare,
-                }))}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Specializări
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {specializations.map((spec) => (
+                    <div key={spec.id_specializare} className="flex items-center">
+                      <input
+                        id={`spec-${spec.id_specializare}`}
+                        type="checkbox"
+                        value={spec.id_specializare}
+                        checked={formData.specializari.includes(spec.id_specializare)}
+                        onChange={handleSpecializationsChange}
+                        className="mr-2"
+                      />
+                      <label htmlFor={`spec-${spec.id_specializare}`}>{spec.nume_specializare}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             <Textarea
               label="Descriere"
@@ -375,11 +394,13 @@ function HospitalsPage() {
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex space-x-2">
-                    <Link to={`/admin/hospitals/edit/${hospital.id_spital}`}>
-                      <Button variant="outline" size="sm">
-                        Editează
-                      </Button>
-                    </Link>
+                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditHospital(hospital)}
+                    >
+                      Editează
+                    </Button>
                     <Button
                       variant="danger"
                       size="sm"

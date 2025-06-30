@@ -147,7 +147,7 @@ function HomePage() {
           </Card>
         </section>
       )}
-      <MyPostsPage />
+     {currentUser && <MyPostsPage />}
 
       
       {/* Features Section */}

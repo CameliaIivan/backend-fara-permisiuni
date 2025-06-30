@@ -77,7 +77,7 @@ function Navbar() {
                     <FaUser />
                     <span>{currentUser.nume}</span>
                   </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+                  <div className="absolute right-0 top-full w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
                     <Link
                       to="/profile"
                       className="block px-4 py-2 text-gray-800 hover:bg-primary-100 transition-colors"

@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const sequelize = require('./config/db');
 const { User, CategorieArticol, Specializare } = require('./models');
 
@@ -32,10 +34,11 @@ async function seed() {
   ]);
 
   // 3) Specializări pentru spitale
-  await Specializare.bulkCreate([
-    { nume_specializare: 'Neurologie' },
-    { nume_specializare: 'Cardiologie' },
-  ]);
+  const specializariPath = path.join(__dirname, 'data', 'specializari.json');
+  const specializari = JSON.parse(fs.readFileSync(specializariPath, 'utf8'));
+  await Specializare.bulkCreate(
+    specializari.map((nume) => ({ nume_specializare: nume }))
+  );
 
   console.log('🌱 Seed complete');
   process.exit(0);

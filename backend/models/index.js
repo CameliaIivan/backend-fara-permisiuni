@@ -32,8 +32,18 @@ User.hasMany(Articol, { foreignKey: 'creat_de' });
 Spital.belongsTo(User, { foreignKey: 'creat_de' });
 User.hasMany(Spital, { foreignKey: 'creat_de' });
 
-Spital.belongsToMany(Specializare, { through: SpitalSpecializare, foreignKey: 'id_spital' });
-Specializare.belongsToMany(Spital, { through: SpitalSpecializare, foreignKey: 'id_specializare' });
+Spital.belongsToMany(Specializare, {
+  through: SpitalSpecializare,
+  foreignKey: 'id_spital',
+  otherKey: 'id_specializare',
+  as: 'specializari',
+});
+Specializare.belongsToMany(Spital, {
+  through: SpitalSpecializare,
+  foreignKey: 'id_specializare',
+  otherKey: 'id_spital',
+  as: 'spitale',
+});
 
 Grup.belongsTo(User, { foreignKey: 'creat_de', as: 'creator' });
 User.hasMany(Grup, { foreignKey: 'creat_de' });
