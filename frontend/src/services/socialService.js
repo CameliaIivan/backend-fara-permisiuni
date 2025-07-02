@@ -165,6 +165,12 @@ export const searchUsers = async (query) => {
   const response = await api.get(`/users/search`, { params: { q: query } })
   return response.data
 }
+
+export const getAdmins = async () => {
+  const response = await api.get('/users/admins')
+  return response.data
+}
+
 export const getMessagesByConversation = async (conversationId) => {
   const response = await api.get(`/mesaje/conversatie/${conversationId}`)
   return response.data

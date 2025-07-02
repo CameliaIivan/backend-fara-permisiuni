@@ -21,6 +21,7 @@ router.get(
   auth.isAdmin,
   userController.getAll,
 )
+router.get("/admins", auth.isAuthenticated, userController.getAdmins)
 router.get("/:id", auth.isAuthenticated, userController.getUserById)
 router.post(
   "/create",

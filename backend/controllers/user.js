@@ -30,6 +30,19 @@ module.exports = {
       res.status(500).json({ error: error.message })
     }
   },
+  
+  // Returnează utilizatorii cu rol de administrator
+  getAdmins: async (req, res) => {
+    try {
+      const admins = await User.findAll({
+        where: { rol: "admin" },
+        attributes: ["id_utilizator", "nume"],
+      })
+      res.json(admins)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
 
   // Obține un utilizator după ID
   getUserById: async (req, res) => {

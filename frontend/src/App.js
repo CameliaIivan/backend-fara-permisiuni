@@ -15,6 +15,7 @@ import ArticleDetailPage from "./pages/ArticleDetailPage"
 import HospitalsPage from "./pages/HospitalsPage"
 import HospitalDetailPage from "./pages/HospitalDetailPage"
 import FaqPage from "./pages/admin/FaqPage"
+import ContactPage from "./pages/ContactPage"
 
 // Protected Pages
 import ProfilePage from "./pages/ProfilePage"
@@ -54,7 +55,14 @@ function App() {
             <Route path="hospitals" element={<HospitalsPage />} />
             <Route path="hospitals/:id" element={<HospitalDetailPage />} />
             <Route path="faq" element={<FaqPage />} />
-
+            <Route
+              path="contact"
+              element={
+                <PrivateRoute>
+                  <ContactPage />
+                </PrivateRoute>
+              }
+            />
             {/* Protected Routes */}
             <Route
               path="dashboard"
