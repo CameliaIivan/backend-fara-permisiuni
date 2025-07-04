@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { getEventById, joinEvent, leaveEvent } from "../services/socialService"
+import { getEventById, joinEvent, leaveEvent , approveEvent, rejectEvent} from "../services/socialService"
 import Card from "../components/Card"
 import Button from "../components/Button"
 import Alert from "../components/Alert"
@@ -16,14 +16,16 @@ function EventDetailPage() {
   const [error, setError] = useState("")
   const [isJoining, setIsJoining] = useState(false)
   const { currentUser, isPremium } = useAuth()
+  const [adminLoading, setAdminLoading] = useState(false)
 
   useEffect(() => {
     const fetchEventData = async () => {
       try {
         setLoading(true)
         const data = await getEventById(id)
+        console.log("Eveniment data :", data)
         setEvent(data)
-        setParticipants(data.participare_eveniments || [])
+        setParticipants(data.ParticipareEveniments || [])
       } catch (error) {
         console.error("Error fetching event data:", error)
         setError("A apărut o eroare la încărcarea datelor evenimentului. Vă rugăm încercați din nou.")
@@ -95,6 +97,32 @@ function EventDetailPage() {
   const isEventFull = event.nr_maxim_participanti && participants.length >= event.nr_maxim_participanti
   const eventDate = new Date(event.data_eveniment)
   const isPastEvent = eventDate < new Date()
+  const handleAdminApprove = async () => {
+        if (!window.confirm("Aprobați acest eveniment?")) return
+        try {
+          setAdminLoading(true)
+        await approveEvent(event.id_eveniment)
+        setEvent({ ...event, aprobat: true })
+        } catch (err) {
+          console.error(err)
+        } finally {
+       setAdminLoading(false)
+        }
+       }
+
+  const handleAdminReject = async () => {
+      if (!window.confirm("Respingeți acest eveniment?")) return
+      try {
+        setAdminLoading(true)
+      await rejectEvent(event.id_eveniment)
+      setEvent({ ...event, respins: true })
+      } catch (err) {
+        console.error(err)
+      } finally {
+       setAdminLoading(false)
+      }        
+       }
+  
 
   return (
     <div>
@@ -190,6 +218,25 @@ function EventDetailPage() {
               </div>
             )}
           </div>
+          {currentUser?.rol === "admin" && !event.aprobat && !event.respins && (
+  <div className="flex space-x-2 mt-4">
+    <Button
+      variant="success"
+      onClick={handleAdminApprove}
+      disabled={adminLoading}
+    >
+      {adminLoading ? "Se procesează..." : "Aprobă eveniment"}
+    </Button>
+    <Button
+      variant="danger"
+      onClick={handleAdminReject}
+      disabled={adminLoading}
+    >
+      {adminLoading ? "Se procesează..." : "Respinge eveniment"}
+    </Button>
+  </div>
+)}
+
         </Card.Body>
       </Card>
 

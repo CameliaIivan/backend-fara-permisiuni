@@ -1,11 +1,19 @@
-const { Eveniment, Postare, User, ParticipareEveniment, Notificare } = require("../models")
+const {
+  Eveniment,
+  Postare,
+  User,
+  ParticipareEveniment,
+  Notificare,
+  Grup,
+  GrupUtilizator,
+} = require("../models")
 const { Op } = require("sequelize")
 
 module.exports = {
   getAll: async (req, res) => {
     try {
       const evenimente = await Eveniment.findAll({
-        where: { aprobat: true },
+        where: { respins: false },
         include: [
           {
             model: Postare,
@@ -91,11 +99,52 @@ module.exports = {
   createEveniment: async (req, res) => {
     try {
       const userId = req.user.id
-      const { titlu, continut, data_eveniment, locatie, 
-        nr_maxim_participanti, alte_detalii, id_grup } = req.body
+     const {
+        titlu,
+        continut,
+        data_eveniment,
+        locatie,
+        nr_maxim_participanti,
+        alte_detalii,
+        id_grup,
+      } = req.body
       if (req.user.rol === "basic") {
-        return res.status(403).json({ error: "Only premium or admin users can create events" })
+        return res
+          .status(403)
+          .json({ error: "Only premium or admin users can create events" })
       }
+
+      // Validate event date
+      if (!data_eveniment || isNaN(Date.parse(data_eveniment))) {
+        return res.status(400).json({ error: "Data eveniment invalidă" })
+      }
+      if (new Date(data_eveniment) < new Date()) {
+        return res
+          .status(400)
+          .json({ error: "Data eveniment trebuie să fie în viitor" })
+      }
+
+      // Validate max participants
+      if (nr_maxim_participanti && nr_maxim_participanti <= 0) {
+        return res
+          .status(400)
+          .json({ error: "Numărul maxim de participanți trebuie să fie pozitiv" })
+      }
+
+      // Check group membership if the event belongs to a group
+      if (id_grup) {
+        const grup = await Grup.findByPk(id_grup)
+        if (!grup) {
+          return res.status(404).json({ error: "Grup not found" })
+        }
+        const isMember = await GrupUtilizator.findOne({
+          where: { id_grup, id_utilizator: userId },
+        })
+        if (!isMember && grup.creat_de !== userId && req.user.rol !== "admin") {
+          return res.status(403).json({ error: "User is not a member of this grup" })
+        }
+      }
+
       const postare = await Postare.create({
         titlu,
         continut,
@@ -113,7 +162,7 @@ module.exports = {
         respins: false,
       })
       // Notifică toți administratorii că există un eveniment ce necesită aprobare
-      const admini = await User.findAll({ where: { rol: 'admin' } })
+      const admini = await User.findAll({ where: { rol: "admin" } })
       await Promise.all(
         admini.map((admin) =>
           Notificare.create({
@@ -159,9 +208,30 @@ module.exports = {
       if (postare.creat_de !== req.user.id && req.user.rol !== "admin") {
         return res.status(403).json({ error: "Unauthorized" })
       }
+      if (eveniment.aprobat && req.user.rol !== "admin") {
+        return res.status(403).json({ error: "Evenimentul a fost deja aprobat" })
+      }
 
       // Update the event
-      const { data_eveniment, locatie, nr_maxim_participanti, alte_detalii, aprobat } = req.body
+      const { data_eveniment, locatie, nr_maxim_participanti, alte_detalii } = req.body
+
+      if (data_eveniment) {
+        if (isNaN(Date.parse(data_eveniment))) {
+          return res.status(400).json({ error: "Data eveniment invalidă" })
+        }
+        if (new Date(data_eveniment) < new Date()) {
+          return res
+            .status(400)
+            .json({ error: "Data eveniment trebuie să fie în viitor" })
+        }
+      }
+
+      if (nr_maxim_participanti && nr_maxim_participanti <= 0) {
+        return res
+          .status(400)
+          .json({ error: "Numărul maxim de participanți trebuie să fie pozitiv" })
+      }
+
       await eveniment.update({
         data_eveniment,
         locatie,

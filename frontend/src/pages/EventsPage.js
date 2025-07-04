@@ -106,23 +106,25 @@ function EventsPage() {
                           </div>
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold">{event.postare?.titlu || "Eveniment fără titlu"}</h3>
-                          <p className="text-gray-600">
-                            {new Date(event.data_eveniment).toLocaleTimeString("ro-RO", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                            {event.locatie && ` • ${event.locatie}`}
-                          </p>
+                          <h3 className="text-xl font-bold">
+                          {event.postare && event.postare.titlu ? event.postare.titlu : "Eveniment fără titlu"}
+                          </h3>
+                            <p className="text-gray-600 mb-4">
+                            {event.postare && event.postare.continut
+                              ? event.postare.continut.length > 100
+                                  ? `${event.postare.continut.substring(0, 100)}...`
+                                 : event.postare.continut
+                                        : "Fără descriere"}
+                                  </p>
                         </div>
                       </div>
-                      <p className="text-gray-600 mb-4">
+                      {/* <p className="text-gray-600 mb-4">
                         {event.postare?.continut
                           ? event.postare.continut.length > 100
                             ? `${event.postare.continut.substring(0, 100)}...`
                             : event.postare.continut
                           : "Fără descriere"}
-                      </p>
+                      </p> */}
                       <div className="flex justify-between items-center">
                         <div className="text-sm text-gray-500">
                           {event.nr_maxim_participanti && <span>Max: {event.nr_maxim_participanti} participanți</span>}

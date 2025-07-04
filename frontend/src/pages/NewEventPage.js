@@ -43,7 +43,7 @@ function NewEventPage() {
           : undefined,
       })
       setSuccess(true)
-      navigate("/events")
+      
     } catch (err) {
       console.error("Error creating event:", err)
       setError(err.response?.data?.error || "A apărut o eroare.")
