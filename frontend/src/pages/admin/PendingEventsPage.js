@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getPendingEvents, approveEvent, deleteEvent } from "../../services/socialService"
+import { getPendingEvents, approveEvent, rejectEvent } from "../../services/socialService"
 import Card from "../../components/Card"
 import Button from "../../components/Button"
 import Alert from "../../components/Alert"
@@ -36,14 +36,14 @@ function PendingEventsPage() {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Ștergeți acest eveniment?")) return
+  const handleReject = async (id) => {
+    if (!window.confirm("Respingeți acest eveniment?")) return
     try {
-      await deleteEvent(id)
-      setSuccess("Evenimentul a fost șters")
+      await rejectEvent(id)
+      setSuccess("Evenimentul a fost respins")
       fetchData()
     } catch (err) {
-      setError(err.response?.data?.error || "Eroare la ștergere")
+       setError(err.response?.data?.error || "Eroare la respingere")
     }
   }
 
@@ -74,8 +74,8 @@ function PendingEventsPage() {
                   </Link>
                   <Button variant="success" size="sm" onClick={() => handleApprove(event.id_eveniment)}>
                     Aproba</Button>
-                  <Button variant="danger" size="sm" onClick={() => handleDelete(event.id_eveniment)}>
-                    Șterge</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleReject(event.id_eveniment)}>
+                    Respinge</Button>
                 </div>
               </Card.Body>
             </Card>

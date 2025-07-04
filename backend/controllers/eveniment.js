@@ -110,6 +110,7 @@ module.exports = {
         nr_maxim_participanti,
         alte_detalii,
         aprobat: false,
+        respins: false,
       })
       // Notifică toți administratorii că există un eveniment ce necesită aprobare
       const admini = await User.findAll({ where: { rol: 'admin' } })
@@ -117,6 +118,7 @@ module.exports = {
         admini.map((admin) =>
           Notificare.create({
             id_utilizator: admin.id_utilizator,
+            id_eveniment: eveniment.id_eveniment,
             continut: `Evenimentul "${titlu}" necesită aprobare`,
           })
         )
@@ -202,7 +204,7 @@ module.exports = {
         return res.status(403).json({ error: "Unauthorized" })
       }
       const events = await Eveniment.findAll({
-        where: { aprobat: false },
+        where: { aprobat: false, respins: false },
         include: [
           {
             model: Postare,
@@ -226,7 +228,23 @@ module.exports = {
       if (!eveniment) {
         return res.status(404).json({ error: "Eveniment not found" })
       }
-      await eveniment.update({ aprobat: true })
+      await eveniment.update({ aprobat: true, respins: false })
+      res.json(eveniment)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
+
+  rejectEveniment: async (req, res) => {
+    try {
+      if (req.user.rol !== "admin") {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
+      const eveniment = await Eveniment.findByPk(req.params.id)
+      if (!eveniment) {
+        return res.status(404).json({ error: "Eveniment not found" })
+      }
+      await eveniment.update({ aprobat: false, respins: true })
       res.json(eveniment)
     } catch (error) {
       res.status(500).json({ error: error.message })

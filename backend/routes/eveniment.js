@@ -12,4 +12,5 @@ router.post("/create", auth.isAuthenticated, evenimentController.createEveniment
 router.put("/update/:id", auth.isAuthenticated, evenimentController.updateEveniment)
 router.delete("/delete/:id", auth.isAuthenticated, evenimentController.deleteEveniment)
 router.put("/approve/:id", auth.isAuthenticated, auth.isAdmin, evenimentController.approveEveniment)
+router.put("/reject/:id", auth.isAuthenticated, auth.isAdmin, evenimentController.rejectEveniment)
 module.exports = router

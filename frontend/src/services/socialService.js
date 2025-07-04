@@ -131,7 +131,12 @@ export const getPendingEvents = async () => {
 }
 
 export const approveEvent = async (id) => {
-  const response = await api.post(`/evenimente/approve/${id}`)
+   const response = await api.put(`/evenimente/approve/${id}`)
+  return response.data
+}
+
+export const rejectEvent = async (id) => {
+  const response = await api.put(`/evenimente/reject/${id}`)
   return response.data
 }
 

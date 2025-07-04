@@ -10,7 +10,8 @@ module.exports = (sequelize) => {
     locatie:               { type: DataTypes.STRING(255) },
     nr_maxim_participanti: { type: DataTypes.INTEGER },
     alte_detalii:          { type: DataTypes.TEXT },
-    aprobat:               { type: DataTypes.BOOLEAN, defaultValue: false }
+    aprobat:               { type: DataTypes.BOOLEAN, defaultValue: false },
+    respins:               { type: DataTypes.BOOLEAN, defaultValue: false }
   }, {
     sequelize,
     modelName: 'Eveniment',

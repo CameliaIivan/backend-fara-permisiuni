@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "../services/socialService"
 import Card from "../components/Card"
 import Button from "../components/Button"
@@ -89,6 +90,17 @@ function NotificationsPage() {
                     className="whitespace-pre-line"
                     dangerouslySetInnerHTML={{ __html: notification.continut }}
                   ></p>
+                  {notification.id_eveniment && (
+                    <p className="mt-2">
+                      <Link
+                        to={`/events/${notification.id_eveniment}`}
+                        className="text-primary-600 underline"
+                        onClick={() => handleMarkAsRead(notification.id_notificare)}
+                      >
+                        Vezi eveniment
+                      </Link>
+                    </p>
+                  )}
                   <p className="text-sm text-gray-500 mt-1">
                     {new Date(notification.data).toLocaleDateString("ro-RO", {
                       day: "numeric",

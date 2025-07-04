@@ -79,6 +79,8 @@ User.hasMany(Comentariu, { foreignKey: 'id_utilizator' });
 
 Notificare.belongsTo(User, { foreignKey: 'id_utilizator' });
 User.hasMany(Notificare, { foreignKey: 'id_utilizator' });
+Notificare.belongsTo(Eveniment, { foreignKey: 'id_eveniment' });
+Eveniment.hasMany(Notificare, { foreignKey: 'id_eveniment' });
 
 LikePostare.belongsTo(User, { foreignKey: 'id_utilizator' });
 User.hasMany(LikePostare, { foreignKey: 'id_utilizator' });

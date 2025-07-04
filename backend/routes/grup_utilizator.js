@@ -13,5 +13,6 @@ router.get("/userGroups/:userId", auth.isAuthenticated, grupUtilizatorController
 router.post("/join", auth.isAuthenticated, grupUtilizatorController.joinGroup)
 // Elimină un utilizator din grup
 router.delete("/remove", auth.isAuthenticated, grupUtilizatorController.removeMember)
+router.delete("/leave", auth.isAuthenticated, grupUtilizatorController.leaveGroup)
 
 module.exports = router

@@ -45,7 +45,7 @@ function FaqPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Întrebări frecvente</h1>
         {isAdmin && (
-          <Link to="/admin/faq/new">
+          <Link to="/admin">
             <Button>Adaugă întrebare</Button>
           </Link>
         )}

@@ -41,8 +41,7 @@ module.exports = {
 
   createNotificare: async (req, res) => {
     try {
-      const { id_utilizator, continut } = req.body
-
+      const { id_utilizator, continut, id_eveniment } = req.body
       // Check if the user exists
       const user = await User.findByPk(id_utilizator)
       if (!user) {
@@ -53,6 +52,7 @@ module.exports = {
       const notificare = await Notificare.create({
         id_utilizator,
         continut,
+        id_eveniment: id_eveniment, // Optional field
       })
 
       res.status(201).json(notificare)

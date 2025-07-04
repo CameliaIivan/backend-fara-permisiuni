@@ -55,11 +55,7 @@ function Navbar() {
                 </Link>
               </>
             )}
-            {isAdmin && (
-              <Link to="/admin" className="hover:text-primary-200 transition-colors">
-                Admin
-              </Link>
-            )}
+            
           </div>
 
           {/* User Menu */}
@@ -172,15 +168,7 @@ function Navbar() {
                   </Link>
                 </>
               )}
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="hover:text-primary-200 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Admin
-                </Link>
-              )}
+              
               {currentUser ? (
                 <button onClick={handleLogout} className="text-left hover:text-primary-200 transition-colors">
                   Deconectare

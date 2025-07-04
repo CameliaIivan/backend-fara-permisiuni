@@ -182,6 +182,31 @@ module.exports = {
       res.status(500).json({ error: error.message })
     }
   },
+   // Allow the current user to leave a group
+  leaveGroup: async (req, res) => {
+    try {
+      const { id_grup } = req.body
+      const id_utilizator = req.user.id
+
+      // Find the membership for the current user
+      const membership = await GrupUtilizator.findOne({
+        where: {
+          id_grup,
+          id_utilizator,
+        },
+      })
+
+      if (!membership) {
+        return res.status(404).json({ error: "Membership not found" })
+      }
+
+      await membership.destroy()
+
+      res.json({ message: "Left group successfully" })
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
 
   // Remove a user from a group
   removeMember: async (req, res) => {

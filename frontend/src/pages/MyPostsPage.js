@@ -150,6 +150,12 @@ function MyPostsPage() {
                     <p>
                       Like-uri: {post.numar_like} | Comentarii: {post.numar_comentarii}
                     </p>
+                     {post.Eveniment && !post.Eveniment.aprobat && !post.Eveniment.respins && (
+                      <p className="text-yellow-600 font-medium">În așteptare</p>
+                    )}
+                    {post.Eveniment && post.Eveniment.respins && (
+                      <p className="text-red-600 font-medium">Respins</p>
+                    )}
                   </div>
                   <Link to={`/posts/${post.id_postare}`}>
                     <Button variant="outline" size="sm">
