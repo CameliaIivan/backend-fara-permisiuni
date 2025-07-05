@@ -44,7 +44,7 @@ function EventDetailPage() {
       // Refresh event data to get updated participants list
       const updatedEvent = await getEventById(id)
       setEvent(updatedEvent)
-      setParticipants(updatedEvent.participare_eveniments || [])
+       setParticipants(updatedEvent.ParticipareEveniments || [])
     } catch (error) {
       console.error("Error joining event:", error)
       setError("A apărut o eroare la înscrierea la eveniment. Vă rugăm încercați din nou.")
@@ -60,7 +60,7 @@ function EventDetailPage() {
       // Refresh event data to get updated participants list
       const updatedEvent = await getEventById(id)
       setEvent(updatedEvent)
-      setParticipants(updatedEvent.participare_eveniments || [])
+      setParticipants(updatedEvent.ParticipareEveniments || [])
     } catch (error) {
       console.error("Error leaving event:", error)
       setError("A apărut o eroare la anularea participării. Vă rugăm încercați din nou.")

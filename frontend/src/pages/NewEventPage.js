@@ -36,7 +36,7 @@ function NewEventPage() {
     if (!isPremium) return
     try {
       setIsSubmitting(true)
-      const event = await createEvent({
+       await createEvent({
         ...formData,
         nr_maxim_participanti: formData.nr_maxim_participanti
           ? Number.parseInt(formData.nr_maxim_participanti)
@@ -49,6 +49,7 @@ function NewEventPage() {
       setError(err.response?.data?.error || "A apărut o eroare.")
     } finally {
       setIsSubmitting(false)
+      setTimeout(() => navigate("/events"), 1500)
     }
   }
 

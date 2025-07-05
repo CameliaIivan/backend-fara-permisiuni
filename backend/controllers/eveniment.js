@@ -13,7 +13,7 @@ module.exports = {
   getAll: async (req, res) => {
     try {
       const evenimente = await Eveniment.findAll({
-        where: { respins: false },
+        where: { aprobat: true, respins: false },
         include: [
           {
             model: Postare,
