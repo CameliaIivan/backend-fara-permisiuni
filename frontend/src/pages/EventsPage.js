@@ -107,14 +107,13 @@ function EventsPage() {
                         </div>
                         <div>
                           <h3 className="text-xl font-bold">
-                          {event.postare && event.postare.titlu ? event.postare.titlu : "Eveniment fără titlu"}
-                          </h3>
+                          {(event.postare || event.Postare)?.titlu || "Eveniment fără titlu"}                          </h3>
                             <p className="text-gray-600 mb-4">
-                            {event.postare && event.postare.continut
-                              ? event.postare.continut.length > 100
-                                  ? `${event.postare.continut.substring(0, 100)}...`
-                                 : event.postare.continut
-                                        : "Fără descriere"}
+                             {(event.postare || event.Postare)?.continut
+                              ? (event.postare || event.Postare).continut.length > 100
+                                ? `${(event.postare || event.Postare).continut.substring(0, 100)}...`
+                                : (event.postare || event.Postare).continut
+                              : "Fără descriere"}
                                   </p>
                         </div>
                       </div>

@@ -1,68 +1,68 @@
 "use client"
-import { useState, useEffect } from "react"
+//import { useState, useEffect } from "react"
 import { Link , useNavigate} from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import Button from "../components/Button"
 import Card from "../components/Card"
 import { FaHospital, FaBook, FaUsers, FaCalendarAlt } from "react-icons/fa"
-import Input from "../components/Input"
-import Textarea from "../components/Textarea"
-import Select from "../components/Select"
-import Alert from "../components/Alert" 
+// import Input from "../components/Input"
+// import Textarea from "../components/Textarea"
+// import Select from "../components/Select"
+// import Alert from "../components/Alert" 
 import MyPostsPage from "./MyPostsPage"
-import { createPost, getUserGroups } from "../services/socialService"
+//import { createPost, getUserGroups } from "../services/socialService"
 
 function HomePage() {
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
 
-  const [groups, setGroups] = useState([])
-  const [postData, setPostData] = useState({ groupId: "", titlu: "", continut: "" })
-  const [submitError, setSubmitError] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // const [groups, setGroups] = useState([])
+  // const [postData, setPostData] = useState({ groupId: "", titlu: "", continut: "" })
+  // const [submitError, setSubmitError] = useState("")
+  // const [isSubmitting, setIsSubmitting] = useState(false)
 
-  useEffect(() => {
-    const fetchGroups = async () => {
-      if (!currentUser) return
-      try {
-        const data = await getUserGroups(currentUser.id)
-        const mapped = data.map((item) => item.Grup || item.grup)
-        setGroups(mapped)
-      } catch (err) {
-        console.error("Error fetching user groups", err)
-      }
-    }
+  // useEffect(() => {
+  //   const fetchGroups = async () => {
+  //     if (!currentUser) return
+  //     try {
+  //       const data = await getUserGroups(currentUser.id)
+  //       const mapped = data.map((item) => item.Grup || item.grup)
+  //       setGroups(mapped)
+  //     } catch (err) {
+  //       console.error("Error fetching user groups", err)
+  //     }
+  //   }
 
-    fetchGroups()
-  }, [currentUser])
+  //   fetchGroups()
+  // }, [currentUser])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setPostData((prev) => ({ ...prev, [name]: value }))
-  }
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target
+  //   setPostData((prev) => ({ ...prev, [name]: value }))
+  // }
   const handleLogout = () => {
     logout()
     navigate("/")
   }
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!postData.groupId || !postData.titlu || !postData.continut) return
-    try {
-      setIsSubmitting(true)
-      setSubmitError("")
-      await createPost({
-        titlu: postData.titlu,
-        continut: postData.continut,
-        id_grup: Number(postData.groupId),
-      })
-      setPostData({ groupId: "", titlu: "", continut: "" })
-    } catch (err) {
-      console.error("Error creating post", err)
-      setSubmitError("A apărut o eroare la crearea postării.")
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+  //   if (!postData.groupId || !postData.titlu || !postData.continut) return
+  //   try {
+  //     setIsSubmitting(true)
+  //     setSubmitError("")
+  //     await createPost({
+  //       titlu: postData.titlu,
+  //       continut: postData.continut,
+  //       id_grup: Number(postData.groupId),
+  //     })
+  //     setPostData({ groupId: "", titlu: "", continut: "" })
+  //   } catch (err) {
+  //     console.error("Error creating post", err)
+  //     setSubmitError("A apărut o eroare la crearea postării.")
+  //   } finally {
+  //     setIsSubmitting(false)
+  //   }
+  //}
 
   return (
     <div>
@@ -95,7 +95,7 @@ function HomePage() {
         </div>
       </section>
 
-      {currentUser && groups.length > 0 && (
+      {/* {currentUser && groups.length > 0 && (
         <section className="mb-12">
           <Card className="max-w-xl mx-auto">
             <Card.Header>
@@ -149,7 +149,8 @@ function HomePage() {
       )}
      {currentUser && <MyPostsPage />}
 
-      
+       */}
+      {currentUser && <MyPostsPage />}
       {/* Features Section */}
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-center mb-8">Ce oferim</h2>

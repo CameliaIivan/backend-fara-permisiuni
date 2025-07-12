@@ -1,7 +1,40 @@
 const fs = require('fs');
 const path = require('path');
 const sequelize = require('./config/db');
-const { User, CategorieArticol, Specializare } = require('./models');
+const { User, CategorieArticol, Specializare, Articol } = require('./models');
+const https = require('https');
+
+async function fetchInfoabilArticles() {
+  const feedUrl = 'https://www.infoabil.ro/feed/';
+  return new Promise((resolve, reject) => {
+    https
+      .get(feedUrl, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          try {
+            const items = data.match(/<item>[\s\S]*?<\/item>/g) || [];
+            const articles = items.map((item) => {
+              const titleMatch = item.match(/<title>(.*?)<\/title>/);
+              const contentMatch = item.match(/<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/);
+              return {
+                titlu: titleMatch ? titleMatch[1] : 'Fără titlu',
+                continut: contentMatch ? contentMatch[1] : '',
+                id_categorie: 1, // implicit "Legislație"
+                creat_de: 1,
+              };
+            });
+            resolve(articles);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      })
+      .on('error', reject);
+  });
+} 
 
 async function seed() {
   await sequelize.authenticate();
@@ -39,6 +72,16 @@ async function seed() {
   await Specializare.bulkCreate(
     specializari.map((nume) => ({ nume_specializare: nume }))
   );
+  
+  // 4) Articole preluate de pe infoabil.ro
+  try {
+    const infoabilArticole = await fetchInfoabilArticles();
+    if (infoabilArticole.length) {
+      await Articol.bulkCreate(infoabilArticole);
+    }
+  } catch (e) {
+    console.warn('Nu s-au putut prelua articolele infoabil:', e.message);
+  }
 
   console.log('🌱 Seed complete');
   process.exit(0);

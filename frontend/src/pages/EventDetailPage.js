@@ -93,7 +93,8 @@ function EventDetailPage() {
   }
 
   const isParticipant = currentUser && participants.some((p) => p.id_utilizator === currentUser.id)
-  const isCreator = currentUser && event.postare && event.postare.creat_de === currentUser.id
+  const postareData = event.postare || event.Postare
+  const isCreator = currentUser && postareData && postareData.creat_de === currentUser.id
   const isEventFull = event.nr_maxim_participanti && participants.length >= event.nr_maxim_participanti
   const eventDate = new Date(event.data_eveniment)
   const isPastEvent = eventDate < new Date()
@@ -150,7 +151,7 @@ function EventDetailPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">{event.postare?.titlu || "Eveniment fără titlu"}</h1>
+               <h1 className="text-3xl font-bold mb-2">{postareData?.titlu || "Eveniment fără titlu"}</h1>
               <p className="text-gray-600">
                 {event.locatie && (
                   <span className="flex items-center">
@@ -183,7 +184,7 @@ function EventDetailPage() {
 
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Descriere</h2>
-            <p className="whitespace-pre-line">{event.postare?.continut || "Fără descriere"}</p>
+             <p className="whitespace-pre-line">{postareData?.continut || "Fără descriere"}</p>
           </div>
 
           {event.alte_detalii && (
@@ -197,7 +198,7 @@ function EventDetailPage() {
             <div>
               <p className="text-gray-600">
                 Organizator:{" "}
-                <span className="font-medium">{event.postare?.utilizator?.nume || "Utilizator necunoscut"}</span>
+                 <span className="font-medium">{postareData?.utilizator?.nume || postareData?.User?.nume || "Utilizator necunoscut"}</span>
               </p>
               <p className="text-gray-600">
                 Participanți: {participants.length}
@@ -252,11 +253,10 @@ function EventDetailPage() {
               <Card key={participant.id_utilizator}>
                 <Card.Body className="flex items-center">
                   <div className="w-10 h-10 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center mr-3">
-                    {participant.utilizator?.nume?.charAt(0) || "?"}
+                     {(participant.utilizator || participant.User)?.nume?.charAt(0) || "?"}
                   </div>
                   <div>
-                    <p className="font-medium">{participant.utilizator?.nume || "Utilizator necunoscut"}</p>
-                    <p className="text-sm text-gray-500">
+<p className="font-medium">{(participant.utilizator || participant.User)?.nume || "Utilizator necunoscut"}</p>                    <p className="text-sm text-gray-500">
                       Înscris la: {new Date(participant.data_inscriere).toLocaleDateString("ro-RO")}
                     </p>
                   </div>
