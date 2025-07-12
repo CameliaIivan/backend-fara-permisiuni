@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "./contexts/AuthContext"
 import PrivateRoute from "./components/PrivateRoute"
 import AdminRoute from "./components/AdminRoute"
+import { NotificationProvider } from "./contexts/NotificationContext"
 
 // Layouts
 import MainLayout from "./layouts/MainLayout"
@@ -39,10 +40,12 @@ import AdminHospitalsPage from "./pages/admin/HospitalsPage"
 import AdminSpecializationsPage from "./pages/admin/SpecializationsPage"
 import AdminFaqPage from "./pages/admin/FaqPage"
 import PendingEventsPage from "./pages/admin/PendingEventsPage";
+import AdminStatisticsPage from "./pages/admin/StatisticsPage";
 
 function App() {
   return (
     <AuthProvider>
+       <NotificationProvider>
       <Router>
         <Routes>
           {/* Public Routes */}
@@ -186,6 +189,14 @@ function App() {
               }
             />
             <Route
+              path="admin/statistics"
+              element={
+                <AdminRoute>
+                  <AdminStatisticsPage />
+                </AdminRoute>
+              }
+              />
+            <Route
               path="admin/articles"
               element={
                 <AdminRoute>
@@ -220,6 +231,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+       </NotificationProvider>
     </AuthProvider>
   )
 }

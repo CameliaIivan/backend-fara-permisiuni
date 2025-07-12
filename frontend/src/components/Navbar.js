@@ -4,9 +4,11 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { FaBars, FaTimes, FaUser, FaBell, FaEnvelope } from "react-icons/fa"
+import { useNotifications } from "../contexts/NotificationContext"
 
 function Navbar() {
   const { currentUser, logout, isAdmin } = useAuth()
+  const { unreadCount } = useNotifications()
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -53,6 +55,11 @@ function Navbar() {
                 <Link to="/events" className="hover:text-primary-200 transition-colors">
                   Evenimente
                 </Link>
+                 {isAdmin && (
+                  <Link to="/admin/statistics" className="hover:text-primary-200 transition-colors">
+                    Statistici
+                  </Link>
+                )}
               </>
             )}
             
@@ -62,11 +69,13 @@ function Navbar() {
           <div className="hidden md:flex items-center space-x-4">
             {currentUser ? (
               <>
-                <Link to="/notifications" className="hover:text-primary-200 transition-colors" aria-label="Notificări">
+                <Link to="/notifications" className="relative hover:text-primary-200 transition-colors" aria-label="Notificări">
                   <FaBell />
+                  {unreadCount > 0 && <span className="absolute -top-1 -right-1 inline-flex h-3 w-3 rounded-full bg-red-500" />}
                 </Link>
-                <Link to="/messages" className="hover:text-primary-200 transition-colors" aria-label="Mesaje">
+                 <Link to="/messages" className="relative hover:text-primary-200 transition-colors" aria-label="Mesaje">
                   <FaEnvelope />
+                  {unreadCount > 0 && <span className="absolute -top-1 -right-1 inline-flex h-3 w-3 rounded-full bg-red-500" />}
                 </Link>
                 <div className="relative group">
                   <button className="flex items-center space-x-1 focus:outline-none">
@@ -145,19 +154,30 @@ function Navbar() {
                   >
                     Evenimente
                   </Link>
+                   {isAdmin && (
+                    <Link
+                      to="/admin/statistics"
+                      className="hover:text-primary-200 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Statistici
+                    </Link>
+                  )}
                   <Link
                     to="/notifications"
-                    className="hover:text-primary-200 transition-colors"
+                    className="relative hover:text-primary-200 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Notificări
+                    {unreadCount > 0 && <span className="absolute -top-1 -right-3 inline-flex h-3 w-3 rounded-full bg-red-500" />}
                   </Link>
                   <Link
                     to="/messages"
-                    className="hover:text-primary-200 transition-colors"
+                    className="relative hover:text-primary-200 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Mesaje
+                    {unreadCount > 0 && <span className="absolute -top-1 -right-3 inline-flex h-3 w-3 rounded-full bg-red-500" />}
                   </Link>
                   <Link
                     to="/profile"

@@ -60,7 +60,7 @@ const schemas = {
       "string.empty": "Parola este obligatorie",
       "any.required": "Parola este obligatorie",
     }),
-    rol: Joi.string().valid("basic", "premium", "admin").default("basic"),
+    //rol: Joi.string().valid("basic", "premium", "admin").default("basic"),
   }),
 
   // Schimbare parolă

@@ -153,11 +153,20 @@ function MessagesPage() {
                     </div>
                     <div className="flex-grow">
                       <h2 className="font-bold">{otherUser.nume}</h2>
-                      {lastMessage ? (
-                        <p className="text-sm text-gray-600 truncate">{lastMessage.continut}</p>
-                      ) : (
-                        <p className="text-sm text-gray-500 italic">Nicio conversație încă</p>
-                      )}
+                      {/* {lastMessage && lastMessage.continut && lastMessage.continut.trim() !== "" ? (
+  <p
+    className={`text-sm truncate ${
+      !lastMessage.este_citita && lastMessage.id_expeditor !== currentUser.id
+        ? "font-bold text-black"
+        : "italic text-gray-600"
+    }`}
+  >
+    {lastMessage.continut}
+  </p>
+) : (
+  <p className="text-sm text-gray-500 italic">Niciun mesaj încă</p>
+)} */}
+
                     </div>
                     <div className="text-xs text-gray-500">
                       {lastMessage

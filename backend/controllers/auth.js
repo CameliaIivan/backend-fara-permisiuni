@@ -7,7 +7,7 @@ module.exports = {
   // Register a new user
   register: async (req, res) => {
     try {
-      const { nume, email, parola, rol = "basic" } = req.body
+      const { nume, email, parola } = req.body
 
       // Validare date
       if (!nume || !email || !parola) {
@@ -38,7 +38,7 @@ module.exports = {
         nume,
         email,
         parola_hash: hashedPassword,
-        rol,
+        rol : "basic" // default role
       })
 
       // Generate JWT token

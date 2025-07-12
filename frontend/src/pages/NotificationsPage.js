@@ -3,21 +3,31 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "../services/socialService"
+import { useNotifications } from "../contexts/NotificationContext"
+import Toggle from "../components/Toggle"
 import Card from "../components/Card"
 import Button from "../components/Button"
 import Alert from "../components/Alert"
 
+function getInitialSettings() {
+  const saved = localStorage.getItem("notificationSettings")
+  return saved
+    ? JSON.parse(saved)
+    : { inApp: true, email: false, sms: false }
+}
+
 function NotificationsPage() {
+  const { notifications: contextNotifications, refresh } = useNotifications()
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [settings, setSettings] = useState(getInitialSettings())
 
   useEffect(() => {
-    const fetchNotifications = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
-        const data = await getNotifications()
-        setNotifications(data)
+        await refresh()
       } catch (error) {
         console.error("Error fetching notifications:", error)
         setError("A apărut o eroare la încărcarea notificărilor. Vă rugăm încercați din nou.")
@@ -26,8 +36,15 @@ function NotificationsPage() {
       }
     }
 
-    fetchNotifications()
-  }, [])
+    fetchData()
+  }, [refresh])
+  useEffect(() => {
+    setNotifications(contextNotifications)
+  }, [contextNotifications])
+
+  useEffect(() => {
+    localStorage.setItem("notificationSettings", JSON.stringify(settings))
+  }, [settings])
 
   const handleMarkAsRead = async (id) => {
     try {
@@ -37,6 +54,7 @@ function NotificationsPage() {
           notification.id_notificare === id ? { ...notification, este_citita: true } : notification,
         ),
       )
+      refresh()
     } catch (error) {
       console.error("Error marking notification as read:", error)
       setError("A apărut o eroare la marcarea notificării ca citită.")
@@ -47,6 +65,7 @@ function NotificationsPage() {
     try {
       await markAllNotificationsAsRead()
       setNotifications((prev) => prev.map((notification) => ({ ...notification, este_citita: true })))
+      refresh()
     } catch (error) {
       console.error("Error marking all notifications as read:", error)
       setError("A apărut o eroare la marcarea tuturor notificărilor ca citite.")
@@ -121,6 +140,36 @@ function NotificationsPage() {
           ))}
         </div>
       )}
+
+      <div className="mt-8">
+      <h2 className="text-xl font-semibold mb-4">Setări notificări</h2>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <span>Notificări în aplicație</span>
+          <Toggle
+            id="inApp"
+            checked={settings.inApp}
+            onChange={() => setSettings({ ...settings, inApp: !settings.inApp })}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <span>Notificări prin email</span>
+          <Toggle
+            id="email"
+            checked={settings.email}
+            onChange={() => setSettings({ ...settings, email: !settings.email })}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <span>Notificări prin SMS</span>
+          <Toggle
+            id="sms"
+            checked={settings.sms}
+            onChange={() => setSettings({ ...settings, sms: !settings.sms })}
+          />
+        </div>
+      </div>
+    </div>
     </div>
   )
 }

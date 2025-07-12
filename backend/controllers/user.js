@@ -87,12 +87,53 @@ module.exports = {
         req.body.parola_hash = await bcrypt.hash(req.body.parola, 10)
         delete req.body.parola
       }
+      // Nu permite schimbarea rolului prin această rută decât pentru admin
+      if (req.body.rol && req.user.rol !== "admin") {
+        delete req.body.rol
+      }
+
       await user.update(req.body)
       res.json(user)
     } catch (error) {
       res.status(500).json({ error: error.message })
     }
   },
+  // Actualizează rolul unui utilizator (doar admin)
+  updateUserRole: async (req, res) => {
+  try {
+    if (req.user.rol !== "admin") {
+      return res
+        .status(403)
+        .json({ error: "Only administrators can change roles" })
+    }
+
+    const user = await User.findByPk(req.params.id)
+    if (!user) return res.status(404).json({ error: "User not found" })
+
+    const { rol } = req.body
+    if (!rol || !["admin", "premium"].includes(rol)) {
+      return res.status(400).json({ error: "Rol invalid" })
+    }
+
+    // ✅ Permitem doar upgrade-uri: basic → premium/admin sau premium → admin
+    const allowedTransitions = {
+      basic: ["premium", "admin"],
+      premium: ["admin"],
+    }
+
+    if (!allowedTransitions[user.rol] || !allowedTransitions[user.rol].includes(rol)) {
+      return res
+        .status(400)
+        .json({ error: `Cannot change role from ${user.rol} to ${rol}` })
+    }
+
+    await user.update({ rol })
+    res.json({ message: "Role updated", user })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+},
+
 
   // Șterge un utilizator
   deleteUser: async (req, res) => {

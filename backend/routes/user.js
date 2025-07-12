@@ -30,6 +30,12 @@ router.post(
   userController.addUser,
 )
 router.put("/update/:id", auth.isAuthenticated, userController.editUser)
+router.patch(
+  "/:id/role",
+  auth.isAuthenticated,
+  auth.isAdmin,
+  userController.updateUserRole,
+)
 router.delete(
   "/delete/:id",
   auth.isAuthenticated,
