@@ -1,5 +1,7 @@
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const fs = require("fs")
+const path = require("path")
 const { User } = require("../models")
 const { Op } = require("sequelize")
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
@@ -145,6 +147,56 @@ module.exports = {
       if (!user) return res.status(404).json({ error: "User not found" })
       await user.destroy()
       res.json({ message: "User deleted" })
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
+  // Încarcă sau actualizează poza de profil a utilizatorului
+  uploadProfilePicture: async (req, res) => {
+    try {
+      const user = await User.findByPk(req.params.id)
+      if (!user) return res.status(404).json({ error: "User not found" })
+
+      if (req.user.rol !== "admin" && req.user.id !== user.id_utilizator) {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" })
+      }
+
+      // Șterge fișierul vechi dacă există
+      if (user.poza_profil) {
+        const oldPath = path.join(__dirname, "..", user.poza_profil)
+        fs.unlink(oldPath, () => {})
+      }
+
+      const filePath = path.join("uploads", req.file.filename)
+      await user.update({ poza_profil: filePath })
+
+      res.json({ mesaj: "Poza actualizată", poza_profil: filePath })
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
+
+  // Șterge poza de profil a utilizatorului
+  deleteProfilePicture: async (req, res) => {
+    try {
+      const user = await User.findByPk(req.params.id)
+      if (!user) return res.status(404).json({ error: "User not found" })
+
+      if (req.user.rol !== "admin" && req.user.id !== user.id_utilizator) {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
+
+      if (user.poza_profil) {
+        const oldPath = path.join(__dirname, "..", user.poza_profil)
+        fs.unlink(oldPath, () => {})
+        await user.update({ poza_profil: null })
+      }
+
+      res.json({ mesaj: "Poza ștearsă" })
     } catch (error) {
       res.status(500).json({ error: error.message })
     }

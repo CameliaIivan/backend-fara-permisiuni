@@ -107,6 +107,28 @@ export function AuthProvider({ children }) {
       throw error.response?.data?.error || "Profile update failed"
     }
   }
+    const uploadProfilePicture = async (file) => {
+    const formData = new FormData()
+    formData.append("poza", file)
+    const response = await axios.post(
+      `${API_URL}/users/${currentUser.id}/poza`,
+      formData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    )
+    const updatedUser = { ...currentUser, poza_profil: response.data.poza_profil }
+    setCurrentUser(updatedUser)
+    return response.data
+  }
+
+  const deleteProfilePicture = async () => {
+    await axios.delete(`${API_URL}/users/${currentUser.id}/poza`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const updatedUser = { ...currentUser, poza_profil: null }
+    setCurrentUser(updatedUser)
+  }
 
   const value = {
     currentUser,
@@ -116,6 +138,8 @@ export function AuthProvider({ children }) {
     register,
     logout,
     updateProfile,
+    uploadProfilePicture,
+    deleteProfilePicture,
     isAdmin: currentUser?.rol === "admin",
     isPremium: currentUser?.rol === "premium" || currentUser?.rol === "admin",
   }

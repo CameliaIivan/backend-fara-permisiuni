@@ -58,6 +58,7 @@ module.exports = {
           nume: newUser.nume,
           email: newUser.email,
           rol: newUser.rol,
+          poza_profil: newUser.poza_profil,
         },
         token,
       })
@@ -114,6 +115,7 @@ module.exports = {
           nume: user.nume,
           email: user.email,
           rol: user.rol,
+          poza_profil: user.poza_profil,
         },
         token,
       })

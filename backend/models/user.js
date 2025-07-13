@@ -8,6 +8,7 @@ module.exports = (sequelize) => {
     nume:           { type: DataTypes.STRING(255), allowNull: false },
     email:          { type: DataTypes.STRING(255), allowNull: false, unique: true },
     parola_hash:    { type: DataTypes.STRING(255), allowNull: false },
+    poza_profil:    { type: DataTypes.STRING(255) },
     rol:            { type: DataTypes.ENUM('basic','premium','admin'), defaultValue: 'basic' },
     stare_cont:     { type: DataTypes.ENUM('activ','suspendat'), defaultValue: 'activ' },
     data_crearii:   { type: DataTypes.DATE, defaultValue: DataTypes.NOW },

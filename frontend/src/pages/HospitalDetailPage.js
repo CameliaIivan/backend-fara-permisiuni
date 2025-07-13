@@ -48,9 +48,11 @@ function HospitalDetailPage() {
     fetchHospital()
   }, [id])
 
-  // Mock coordinates for hospital (in a real app, these would come from the database)
+  // Return coordinates saved for the hospital or fall back to Romania center
   const getHospitalCoordinates = () => {
-    // This is just a mock function - in a real app, you would use actual coordinates
+     if (hospital && hospital.latitudine && hospital.longitudine) {
+      return [Number(hospital.latitudine), Number(hospital.longitudine)]
+    }
     return [45.9443, 25.0094] // Default coordinates for Romania
   }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, memo } from "react"
 import { useParams, Link } from "react-router-dom"
 import { getConversationById, sendMessage } from "../services/socialService"
 import Card from "../components/Card"
@@ -8,6 +8,40 @@ import Button from "../components/Button"
 import Textarea from "../components/Textarea"
 import Alert from "../components/Alert"
 import { useAuth } from "../contexts/AuthContext"
+import isEqual from "lodash/isEqual" // <--- import comparare profundă
+
+const MessageList = memo(function MessageList({ messages, currentUser, endRef }) {
+  return (
+    <div className="space-y-4">
+      {messages.map((message) => {
+        const isCurrentUser = message.id_expeditor === currentUser.id
+        return (
+          <div
+            key={message.id_mesaj}
+            className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-[70%] rounded-lg p-3 ${
+                isCurrentUser
+                  ? "bg-primary-100 text-primary-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              <p className="whitespace-pre-line">{message.continut}</p>
+              <p className="text-xs text-gray-500 mt-1 text-right">
+                {new Date(message.data_trimitere).toLocaleTimeString("ro-RO", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+          </div>
+        )
+      })}
+      <div ref={endRef} />
+    </div>
+  )
+})
 
 function ConversationPage() {
   const { id } = useParams()
@@ -17,35 +51,42 @@ function ConversationPage() {
   const [error, setError] = useState("")
   const [newMessage, setNewMessage] = useState("")
   const [sending, setSending] = useState(false)
+  const [shouldScroll, setShouldScroll] = useState(false) // <--- control scroll
   const { currentUser } = useAuth()
   const messagesEndRef = useRef(null)
 
-  useEffect(() => {
-    const fetchConversation = async () => {
-      try {
-        setLoading(true)
-        const data = await getConversationById(id)
-        setConversation(data.conversatie)
-        setMessages(data.mesaje || [])
-      } catch (error) {
-        console.error("Error fetching conversation:", error)
-        setError("A apărut o eroare la încărcarea conversației. Vă rugăm încercați din nou.")
-      } finally {
-        setLoading(false)
+  const fetchConversation = async () => {
+    try {
+      const data = await getConversationById(id)
+      setConversation(data.conversatie)
+
+      const newMessages = data.mesaje || []
+
+      // Comparare profundă - nu actualizăm dacă sunt identice
+      if (!isEqual(newMessages, messages)) {
+        setMessages(newMessages)
+        setShouldScroll(true) // doar dacă sunt diferite
       }
+    } catch (error) {
+      console.error("Error fetching conversation:", error)
+      setError("A apărut o eroare la încărcarea conversației. Vă rugăm încercați din nou.")
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchConversation()
-
-    // Poll for new messages every 10 seconds
     const interval = setInterval(fetchConversation, 10000)
     return () => clearInterval(interval)
   }, [id])
 
-  // Scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    if (shouldScroll && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+      setShouldScroll(false)
+    }
+  }, [shouldScroll, messages])
 
   const handleSendMessage = async (e) => {
     e.preventDefault()
@@ -60,6 +101,7 @@ function ConversationPage() {
       const sentMessage = await sendMessage(messageData)
       setMessages((prev) => [...prev, sentMessage])
       setNewMessage("")
+      setShouldScroll(true) // scroll după trimitere
     } catch (error) {
       console.error("Error sending message:", error)
       setError("A apărut o eroare la trimiterea mesajului. Vă rugăm încercați din nou.")
@@ -91,7 +133,10 @@ function ConversationPage() {
     )
   }
 
-  const otherUser = currentUser.id === conversation.id_utilizator_1 ? conversation.User2 : conversation.User1
+  const otherUser =
+    currentUser.id === conversation.id_utilizator_1
+      ? conversation.User2
+      : conversation.User1
 
   return (
     <div>
@@ -117,29 +162,11 @@ function ConversationPage() {
             <p className="text-gray-500">Trimite primul mesaj mai jos!</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {messages.map((message) => {
-              const isCurrentUser = message.id_expeditor === currentUser.id
-              return (
-                <div key={message.id_mesaj} className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
-                      isCurrentUser ? "bg-primary-100 text-primary-800" : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    <p className="whitespace-pre-line">{message.continut}</p>
-                    <p className="text-xs text-gray-500 mt-1 text-right">
-                      {new Date(message.data_trimitere).toLocaleTimeString("ro-RO", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-            <div ref={messagesEndRef} />
-          </div>
+          <MessageList
+            messages={messages}
+            currentUser={currentUser}
+            endRef={messagesEndRef}
+          />
         )}
       </div>
 

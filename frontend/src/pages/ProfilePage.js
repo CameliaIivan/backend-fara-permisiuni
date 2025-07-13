@@ -7,9 +7,16 @@ import Card from "../components/Card"
 import Input from "../components/Input"
 import Button from "../components/Button"
 import Alert from "../components/Alert"
+import { API_URL } from "../config"
 
 function ProfilePage() {
-  const { currentUser, updateProfile, logout } = useAuth()
+   const {
+    currentUser,
+    updateProfile,
+    uploadProfilePicture,
+    deleteProfilePicture,
+    logout,
+  } = useAuth()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     nume: currentUser?.nume || "",
@@ -20,6 +27,7 @@ function ProfilePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [image, setImage] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -27,6 +35,37 @@ function ProfilePage() {
       ...prev,
       [name]: value,
     }))
+  }
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0])
+    }
+  }
+
+  const handleUploadImage = async () => {
+    if (!image) return
+    try {
+      setLoading(true)
+      await uploadProfilePicture(image)
+      setSuccess("Poza a fost încărcată")
+      setImage(null)
+    } catch (err) {
+      setError("Eroare la încărcarea pozei")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteImage = async () => {
+    try {
+      setLoading(true)
+      await deleteProfilePicture()
+      setSuccess("Poza a fost ștearsă")
+    } catch (err) {
+      setError("Eroare la ștergerea pozei")
+    } finally {
+      setLoading(false)
+    }
   }
   const handleLogout = async () => {
     try {
@@ -110,6 +149,32 @@ function ProfilePage() {
             <div>
               <p className="text-sm text-gray-500">Data înregistrării</p>
               <p className="font-medium">{new Date(currentUser?.data_inregistrare).toLocaleDateString("ro-RO")}</p>
+            </div>
+          </div>
+           <div className="flex items-center">
+            {currentUser?.poza_profil ? (
+              <img
+                src={`${API_URL.replace('/api', '')}/${currentUser.poza_profil}`}
+                alt="Poza profil"
+                className="w-24 h-24 rounded-full object-cover mr-4"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-200 mr-4 flex items-center justify-center text-sm text-gray-500">
+                Fără poză
+              </div>
+            )}
+            <div>
+              <input type="file" onChange={handleImageChange} />
+              <div className="mt-2 flex space-x-2">
+                <Button type="button" onClick={handleUploadImage} disabled={loading || !image}>
+                  Încarcă
+                </Button>
+                {currentUser?.poza_profil && (
+                  <Button type="button" variant="secondary" onClick={handleDeleteImage}>
+                    Șterge
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </Card.Body>

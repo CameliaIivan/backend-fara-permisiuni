@@ -14,6 +14,8 @@ const router = express.Router()
 
 const userController = require("../controllers").userController
 const auth = require("../middlewares/index")
+const upload = require("../controllers/multer")
+
 router.get("/search", auth.isAuthenticated, userController.searchUsers)
 router.get(
   "/getAll",
@@ -30,6 +32,17 @@ router.post(
   userController.addUser,
 )
 router.put("/update/:id", auth.isAuthenticated, userController.editUser)
+router.post(
+  "/:id/poza",
+  auth.isAuthenticated,
+  upload.single("poza"),
+  userController.uploadProfilePicture,
+)
+router.delete(
+  "/:id/poza",
+  auth.isAuthenticated,
+  userController.deleteProfilePicture,
+)
 router.patch(
   "/:id/role",
   auth.isAuthenticated,

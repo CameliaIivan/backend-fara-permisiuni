@@ -1,5 +1,8 @@
 const { Spital, Specializare, SpitalSpecializare, User } = require("../models")
 const { Op } = require("sequelize")
+const NodeGeocoder = require("node-geocoder")
+
+const geocoder = NodeGeocoder({ provider: "openstreetmap" })
 
 module.exports = {
   getAll: async (req, res) => {
@@ -105,12 +108,40 @@ module.exports = {
         return res.status(403).json({ error: "Only administrators can create hospitals" })
       }
 
-      const { nume, locatie, tip_serviciu, grad_accesibilitate, contact, website, descriere, specializari } = req.body
+      const {
+        nume,
+        locatie,
+        latitudine,
+        longitudine,
+        tip_serviciu,
+        grad_accesibilitate,
+        contact,
+        website,
+        descriere,
+        specializari,
+      } = req.body
+
+      let lat = latitudine
+      let lon = longitudine
+
+      if ((!lat || !lon) && locatie) {
+        try {
+          const [geo] = await geocoder.geocode(locatie)
+          if (geo) {
+            lat = geo.latitude
+            lon = geo.longitude
+          }
+        } catch (geoErr) {
+          console.error("Geocoding failed:", geoErr)
+        }
+      }
 
       // Create the hospital
       const spital = await Spital.create({
         nume,
         locatie,
+        latitudine: lat,
+        longitudine: lon,
         tip_serviciu,
         grad_accesibilitate,
         contact,
@@ -118,7 +149,7 @@ module.exports = {
         descriere,
         creat_de: req.user.id,
       })
-
+      
       // Add specializations if provided
       if (specializari && specializari.length > 0) {
         const spitalSpecializari = specializari.map((id_specializare) => ({
@@ -168,6 +199,8 @@ module.exports = {
       const {
         nume,
         locatie,
+        latitudine,
+        longitudine,
         tip_serviciu,
         grad_accesibilitate,
         contact,
@@ -184,6 +217,25 @@ module.exports = {
 
       if (nume !== undefined) updateData.nume = nume
       if (locatie !== undefined) updateData.locatie = locatie
+      let lat = latitudine !== undefined ? latitudine : spital.latitudine
+      let lon = longitudine !== undefined ? longitudine : spital.longitudine
+      const locToGeocode = locatie !== undefined ? locatie : spital.locatie
+
+      if ((!lat || !lon) && locToGeocode) {
+        try {
+          const [geo] = await geocoder.geocode(locToGeocode)
+          if (geo) {
+            lat = geo.latitude
+            lon = geo.longitude
+          }
+        } catch (geoErr) {
+          console.error("Geocoding failed:", geoErr)
+        }
+      }
+
+      updateData.latitudine = lat
+      updateData.longitudine = lon
+      
       if (tip_serviciu !== undefined) updateData.tip_serviciu = tip_serviciu
       if (grad_accesibilitate !== undefined)
         updateData.grad_accesibilitate = grad_accesibilitate
