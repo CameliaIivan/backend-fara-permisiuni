@@ -69,7 +69,7 @@ export const deletePost = async (id) => {
 
 // Comments
 export const getCommentsByPost = async (postId) => {
-  const response = await api.get(`/comentarii/post/${postId}`)
+   const response = await api.get(`/comentarii/postare/${postId}`)
   return response.data
 }
 

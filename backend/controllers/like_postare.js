@@ -23,7 +23,7 @@ module.exports = {
 
   getLikesByPost: async (req, res) => {
     try {
-      const postId = req.params.idPostare
+      const postId = req.params.postareId
 
       // Check if the post exists
       const post = await Postare.findByPk(postId)

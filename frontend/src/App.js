@@ -31,6 +31,7 @@ import ConversationPage from "./pages/ConversationPage"
 import NotificationsPage from "./pages/NotificationsPage"
 import DashboardPage from "./pages/DashboardPage"
 import MyPostsPage from "./pages/MyPostsPage"
+import PostDetailPage from "./pages/PostDetailPage"
 
 // Admin Pages
 import AdminDashboardPage from "./pages/admin/DashboardPage"
@@ -155,7 +156,16 @@ function App() {
                 </PrivateRoute>
               }
             />
+
              <Route
+              path="posts/:id"
+              element={
+                <PrivateRoute>
+                  <PostDetailPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="my-posts"
               element={
                 <PrivateRoute>

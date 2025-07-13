@@ -14,7 +14,7 @@ function GroupCreatePage() {
   const [formData, setFormData] = useState({
     nume: "",
     descriere: "",
-    este_privata: false,
+    
   })
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -82,17 +82,6 @@ function GroupCreatePage() {
               onChange={handleChange}
               rows={4}
             />
-            <div className="mb-4 flex items-center">
-              <input
-                id="este_privata"
-                name="este_privata"
-                type="checkbox"
-                checked={formData.este_privata}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              <label htmlFor="este_privata">Grup privat</label>
-            </div>
             <div className="flex justify-end">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Se creează..." : "Creează grup"}

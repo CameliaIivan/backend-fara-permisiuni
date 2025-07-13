@@ -26,8 +26,6 @@ function HospitalsPage() {
     grad_accesibilitate: "",
     contact: "",
     website: "",
-     latitudine: "",
-    longitudine: "",
     descriere: "",
     specializari: [],
   })
@@ -137,8 +135,6 @@ function HospitalsPage() {
       grad_accesibilitate: hospital.grad_accesibilitate || "",
       contact: hospital.contact || "",
       website: hospital.website || "",
-      latitudine: hospital.latitudine || "",
-      longitudine: hospital.longitudine || "",
       descriere: hospital.descriere || "",
       specializari: hospital.specializari ? hospital.specializari.map((s) => s.id_specializare) : [],
     })
@@ -153,8 +149,7 @@ function HospitalsPage() {
       grad_accesibilitate: "",
       contact: "",
       website: "",
-      latitudine: "",
-      longitudine: "",
+      
       descriere: "",
       specializari: [],
     })
@@ -257,20 +252,7 @@ function HospitalsPage() {
                 value={formData.website}
                 onChange={handleInputChange}
               />
-              <Input
-                label="Latitudine"
-                id="latitudine"
-                name="latitudine"
-                value={formData.latitudine}
-                onChange={handleInputChange}
-              />
-              <Input
-                label="Longitudine"
-                id="longitudine"
-                name="longitudine"
-                value={formData.longitudine}
-                onChange={handleInputChange}
-              />
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Specializări

@@ -118,7 +118,7 @@ function GroupDetailPage() {
           <Card className="mb-8">
             <Card.Body>
               <h1 className="text-3xl font-bold mb-2">{group.nume}</h1>
-              {group.este_privata && <span className="inline-block bg-secondary-100 text-secondary-800 text-sm px-2 py-1 rounded mb-4">Grup privat</span>}
+              
               <p className="text-gray-600 mb-6">{group.descriere}</p>
               <div className="flex justify-between items-center">
                 <div className="text-sm text-gray-500">

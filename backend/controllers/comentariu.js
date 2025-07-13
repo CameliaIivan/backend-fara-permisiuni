@@ -37,7 +37,7 @@ module.exports = {
   getComentariiByPostare: async (req, res) => {
     try {
       const comentarii = await Comentariu.findAll({
-        where: { id_postare: req.params.idPostare },
+        where: { id_postare: req.params.postareId },
         include: [
           {
             model: User,
