@@ -146,10 +146,7 @@ function ProfilePage() {
               <p className="text-sm text-gray-500">Tip cont</p>
               <p className="font-medium capitalize">{currentUser?.rol}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Data înregistrării</p>
-              <p className="font-medium">{new Date(currentUser?.data_inregistrare).toLocaleDateString("ro-RO")}</p>
-            </div>
+            
           </div>
            <div className="flex items-center">
             {currentUser?.poza_profil ? (

@@ -430,7 +430,7 @@ function ArticlesPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Gestionare articole</h1>
+        <h1 className="text-3xl font-bold">Articole</h1>
         {isAdmin && (
           <Button onClick={() => setShowForm(!showForm)}>
             {showForm ? "Anulează" : "Adaugă articol"}

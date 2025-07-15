@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import {useCallback,  useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   getPostById,
@@ -24,23 +24,22 @@ function PostDetailPage() {
   const [editingId, setEditingId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
 
-  const fetchPost = async () => {
-    try {
-      setLoading(true);
-      const data = await getPostById(id);
-      setPost(data);
-    } catch (err) {
-      console.error("Error fetching post", err);
-      setError("A apărut o eroare la încărcarea postării.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchPost = useCallback(async () => {
+  try {
+    setLoading(true);
+    const data = await getPostById(id);
+    setPost(data);
+  } catch (err) {
+    console.error("Error fetching post", err);
+    setError("A apărut o eroare la încărcarea postării.");
+  } finally {
+    setLoading(false);
+  }
+}, [id]); // id e necesar în dependențe
 
-  useEffect(() => {
-    fetchPost();
-  }, [id]);
-
+useEffect(() => {
+  fetchPost();
+}, [fetchPost]);
   const hasLiked = post?.likes?.some((l) => l.id_utilizator === currentUser?.id);
 
   const handleLike = async () => {
@@ -145,7 +144,7 @@ function PostDetailPage() {
               {post.comentarii.map((c) => (
                 <div key={c.id_comentariu} className="border p-3 rounded-md">
                   <p className="text-sm text-gray-500 mb-1">
-                    {c.utilizator?.nume} - {new Date(c.data_comentariu).toLocaleString("ro-RO")}
+                     {(c.utilizator?.nume || c.User?.nume || "Utilizator necunoscut")} - {new Date(c.data_comentariu).toLocaleString("ro-RO")}
                   </p>
                   {editingId === c.id_comentariu ? (
                     <div className="space-y-2">
